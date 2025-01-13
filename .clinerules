@@ -1,0 +1,19 @@
+# Use
+- biome
+- bun
+- next.js@15
+- react@19
+- pwa
+- shadacon/ui
+- turbopack
+
+# Concept
+- Minimum Configuration
+
+# Rule
+- Follow official documentation strictly as the primary source of truth
+- Ask for documentation link if not provided
+- Consult node_modules when official documentation is not available or unclear
+
+# shadcn/ui
+- bunx @shadcn/ui@latest add xxx
