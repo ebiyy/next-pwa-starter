@@ -1,17 +1,68 @@
 import { cache } from "@/lib/cache";
-import { supabase } from "@/lib/supabase";
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 
 const app = new Hono().basePath("/api");
 
-// Health check endpoint
-app.get("/health", (c) => {
-  return c.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-  });
-});
+// モックデータ
+const mockFeatures = [
+  {
+    id: 1,
+    title: "Next.js 15",
+    description:
+      "App RouterとServer Componentsによる最新のReactアプリケーション開発",
+    icon: "🚀",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    title: "Supabase",
+    description: "オープンソースのFirebase代替。認証やデータベースを簡単に実装",
+    icon: "🗄️",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 3,
+    title: "PWA対応",
+    description: "Progressive Web Appとしてインストール可能",
+    icon: "📱",
+    created_at: new Date().toISOString(),
+  },
+];
+
+const mockTechStacks = [
+  {
+    id: 1,
+    name: "Next.js",
+    description: "The React Framework for the Web",
+    url: "https://nextjs.org",
+    category: "frontend",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    name: "Supabase",
+    description: "Open source Firebase alternative",
+    url: "https://supabase.com",
+    category: "backend",
+    created_at: new Date().toISOString(),
+  },
+];
+
+const mockChangelogs = [
+  {
+    id: 1,
+    version: "1.0.0",
+    description: "初期リリース",
+    release_date: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    version: "1.1.0",
+    description: "PWA対応を追加",
+    release_date: new Date(Date.now() - 86400000).toISOString(), // 1日前
+  },
+];
 
 // Features
 app.get("/features", async (c) => {
@@ -19,18 +70,8 @@ app.get("/features", async (c) => {
   if (cached) {
     return c.json(JSON.parse(cached));
   }
-
-  const { data, error } = await supabase
-    .from("features")
-    .select("*")
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  await cache.set("features", JSON.stringify(data), 60); // 1分キャッシュ
-  return c.json(data);
+  await cache.set("features", JSON.stringify(mockFeatures), 60);
+  return c.json(mockFeatures);
 });
 
 // Changelogs
@@ -39,18 +80,8 @@ app.get("/changelogs", async (c) => {
   if (cached) {
     return c.json(JSON.parse(cached));
   }
-
-  const { data, error } = await supabase
-    .from("changelogs")
-    .select("*")
-    .order("release_date", { ascending: false });
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  await cache.set("changelogs", JSON.stringify(data), 60); // 1分キャッシュ
-  return c.json(data);
+  await cache.set("changelogs", JSON.stringify(mockChangelogs), 60);
+  return c.json(mockChangelogs);
 });
 
 // Tech stacks
@@ -59,18 +90,8 @@ app.get("/tech-stacks", async (c) => {
   if (cached) {
     return c.json(JSON.parse(cached));
   }
-
-  const { data, error } = await supabase
-    .from("tech_stacks")
-    .select("*")
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  await cache.set("tech_stacks", JSON.stringify(data), 60); // 1分キャッシュ
-  return c.json(data);
+  await cache.set("tech_stacks", JSON.stringify(mockTechStacks), 60);
+  return c.json(mockTechStacks);
 });
 
 // Tech stacks by category
@@ -83,18 +104,11 @@ app.get("/tech-stacks/:category", async (c) => {
     return c.json(JSON.parse(cached));
   }
 
-  const { data, error } = await supabase
-    .from("tech_stacks")
-    .select("*")
-    .eq("category", category)
-    .order("created_at", { ascending: true });
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  await cache.set(cacheKey, JSON.stringify(data), 60); // 1分キャッシュ
-  return c.json(data);
+  const filteredStacks = mockTechStacks.filter(
+    (stack) => stack.category === category
+  );
+  await cache.set(cacheKey, JSON.stringify(filteredStacks), 60);
+  return c.json(filteredStacks);
 });
 
 export const GET = handle(app);
