@@ -1,26 +1,19 @@
 import { ChangelogList } from "@/components/changelog-list";
 import { FeatureCard } from "@/components/feature-card";
-import { TechStackGrid } from "@/components/tech-stack-grid";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiClient } from "@/lib/api-client";
 import { Suspense, use } from "react";
 
 function Features() {
   const features = use(apiClient.getFeatures());
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {features.map((feature) => (
         <FeatureCard key={feature.id} feature={feature} />
       ))}
     </div>
   );
-}
-
-function TechStacks() {
-  const techStacks = use(apiClient.getTechStacks());
-  return <TechStackGrid techStacks={techStacks} />;
 }
 
 function Changelogs() {
@@ -54,48 +47,20 @@ export default function Home() {
           </div>
 
           <div className="space-y-8">
-            <Tabs defaultValue="features" className="space-y-6">
-              <div className="flex justify-center">
-                <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
-                  <TabsTrigger value="features" className="hover:text-primary">
-                    Features
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="tech-stack"
-                    className="hover:text-primary"
-                  >
-                    Tech Stack
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              <TabsContent value="features" className="space-y-4">
-                <Suspense
-                  fallback={
-                    <div className="animate-pulse space-y-4">
-                      <div className="h-24 rounded-lg bg-muted" />
-                      <div className="h-24 rounded-lg bg-muted" />
-                      <div className="h-24 rounded-lg bg-muted" />
-                    </div>
-                  }
-                >
-                  <Features />
-                </Suspense>
-              </TabsContent>
-
-              <TabsContent value="tech-stack" className="space-y-4">
-                <Suspense
-                  fallback={
-                    <div className="animate-pulse space-y-4">
-                      <div className="h-24 rounded-lg bg-muted" />
-                      <div className="h-24 rounded-lg bg-muted" />
-                    </div>
-                  }
-                >
-                  <TechStacks />
-                </Suspense>
-              </TabsContent>
-            </Tabs>
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold tracking-tight">Features</h2>
+              <Suspense
+                fallback={
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-24 rounded-lg bg-muted" />
+                    <div className="h-24 rounded-lg bg-muted" />
+                    <div className="h-24 rounded-lg bg-muted" />
+                  </div>
+                }
+              >
+                <Features />
+              </Suspense>
+            </div>
 
             <div className="space-y-4">
               <h2 className="text-2xl font-bold tracking-tight">Changelog</h2>
