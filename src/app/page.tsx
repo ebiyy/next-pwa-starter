@@ -1,48 +1,16 @@
 import { ChangelogList } from "@/components/changelog-list";
 import { FeatureCard } from "@/components/feature-card";
 import { TechStackGrid } from "@/components/tech-stack-grid";
-import type { Changelog, Feature, TechStack } from "@/types/schema";
-import { Suspense } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { apiClient } from "@/lib/api-client";
+import { Suspense, use } from "react";
 
-async function getFeatures(): Promise<Feature[]> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api`
-    : "http://localhost:3000/api";
-
-  const res = await fetch(`${baseUrl}/features`, { cache: "no-store" });
-  return res.json();
-}
-
-async function getChangelogs(): Promise<Changelog[]> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api`
-    : "http://localhost:3000/api";
-
-  const res = await fetch(`${baseUrl}/changelogs`, { cache: "no-store" });
-  return res.json();
-}
-
-async function getTechStacks(): Promise<TechStack[]> {
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/api`
-    : "http://localhost:3000/api";
-
-  const res = await fetch(`${baseUrl}/tech-stacks`, { cache: "no-store" });
-  return res.json();
-}
-
-function Features({ promise }: { promise: Promise<Feature[]> }) {
+function Features() {
+  const features = use(apiClient.getFeatures());
   return (
-    <Suspense fallback={<div>Loading features...</div>}>
-      <FeaturesContent promise={promise} />
-    </Suspense>
-  );
-}
-
-async function FeaturesContent({ promise }: { promise: Promise<Feature[]> }) {
-  const features = await promise;
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {features.map((feature) => (
         <FeatureCard key={feature.id} feature={feature} />
       ))}
@@ -50,58 +18,101 @@ async function FeaturesContent({ promise }: { promise: Promise<Feature[]> }) {
   );
 }
 
-function TechStacks({ promise }: { promise: Promise<TechStack[]> }) {
-  return (
-    <Suspense fallback={<div>Loading tech stacks...</div>}>
-      <TechStacksContent promise={promise} />
-    </Suspense>
-  );
-}
-
-async function TechStacksContent({
-  promise,
-}: { promise: Promise<TechStack[]> }) {
-  const techStacks = await promise;
+function TechStacks() {
+  const techStacks = use(apiClient.getTechStacks());
   return <TechStackGrid techStacks={techStacks} />;
 }
 
-function Changelogs({ promise }: { promise: Promise<Changelog[]> }) {
-  return (
-    <Suspense fallback={<div>Loading changelogs...</div>}>
-      <ChangelogsContent promise={promise} />
-    </Suspense>
-  );
-}
-
-async function ChangelogsContent({
-  promise,
-}: { promise: Promise<Changelog[]> }) {
-  const changelogs = await promise;
+function Changelogs() {
+  const changelogs = use(apiClient.getChangelogs());
   return <ChangelogList changelogs={changelogs} />;
 }
 
 export default function Home() {
-  const featuresPromise = getFeatures();
-  const changelogsPromise = getChangelogs();
-  const techStacksPromise = getTechStacks();
-
   return (
-    <main className="container mx-auto p-4 space-y-8">
-      <h1 className="text-4xl font-bold text-center">Next.js PWA Starter</h1>
+    <main className="relative min-h-screen">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">機能</h2>
-        <Features promise={featuresPromise} />
-      </section>
+      <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]">
+        <div className="absolute left-0 right-0 top-0 -z-10 m-auto h-[310px] w-[310px] rounded-full bg-primary/20 opacity-20 blur-[100px]" />
+      </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">技術スタック</h2>
-        <TechStacks promise={techStacksPromise} />
-      </section>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="space-y-6 text-center mb-8">
+            <Badge className="animate-fade-up" variant="outline">
+              v1.0.0 Now Available
+            </Badge>
+            <h1 className="animate-fade-up text-3xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+              Build Amazing Apps
+            </h1>
+            <p className="mx-auto max-w-[600px] text-muted-foreground animate-fade-up text-base sm:text-xl">
+              モダンなWeb開発のためのスターターテンプレート。
+            </p>
+          </div>
 
-      <section className="space-y-4">
-        <Changelogs promise={changelogsPromise} />
-      </section>
+          <div className="space-y-8">
+            <Tabs defaultValue="features" className="space-y-6">
+              <div className="flex justify-center">
+                <TabsList className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground">
+                  <TabsTrigger value="features" className="hover:text-primary">
+                    Features
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="tech-stack"
+                    className="hover:text-primary"
+                  >
+                    Tech Stack
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="features" className="space-y-4">
+                <Suspense
+                  fallback={
+                    <div className="animate-pulse space-y-4">
+                      <div className="h-24 rounded-lg bg-muted" />
+                      <div className="h-24 rounded-lg bg-muted" />
+                      <div className="h-24 rounded-lg bg-muted" />
+                    </div>
+                  }
+                >
+                  <Features />
+                </Suspense>
+              </TabsContent>
+
+              <TabsContent value="tech-stack" className="space-y-4">
+                <Suspense
+                  fallback={
+                    <div className="animate-pulse space-y-4">
+                      <div className="h-24 rounded-lg bg-muted" />
+                      <div className="h-24 rounded-lg bg-muted" />
+                    </div>
+                  }
+                >
+                  <TechStacks />
+                </Suspense>
+              </TabsContent>
+            </Tabs>
+
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold tracking-tight">Changelog</h2>
+              <Suspense
+                fallback={
+                  <div className="animate-pulse space-y-4">
+                    <div className="h-24 rounded-lg bg-muted" />
+                    <div className="h-24 rounded-lg bg-muted" />
+                  </div>
+                }
+              >
+                <Changelogs />
+              </Suspense>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
