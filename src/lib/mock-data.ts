@@ -7,6 +7,7 @@ export const mockFeatures: Feature[] = [
     description:
       "App RouterとServer Componentsによる最新のReactアプリケーション開発",
     icon_name: "code",
+    doc_url: "https://nextjs.org",
     created_at: new Date().toISOString(),
   },
   {
@@ -14,6 +15,7 @@ export const mockFeatures: Feature[] = [
     title: "Supabase",
     description: "オープンソースのFirebase代替。認証やデータベースを簡単に実装",
     icon_name: "database",
+    doc_url: "https://supabase.com",
     created_at: new Date().toISOString(),
   },
   {
@@ -21,6 +23,31 @@ export const mockFeatures: Feature[] = [
     title: "PWA対応",
     description: "Progressive Web Appとしてインストール可能",
     icon_name: "smartphone",
+    doc_url: "https://web.dev/progressive-web-apps/",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "4",
+    title: "shadcn/ui",
+    description: "美しく、アクセシブルなUIコンポーネントライブラリ",
+    icon_name: "palette",
+    doc_url: "https://ui.shadcn.com",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "5",
+    title: "Turbopack",
+    description: "Rustで書かれた超高速なビルドツール",
+    icon_name: "code",
+    doc_url: "https://turbo.build",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "6",
+    title: "Biome",
+    description: "高速で一貫性のあるコード品質管理ツール",
+    icon_name: "code",
+    doc_url: "https://biomejs.dev",
     created_at: new Date().toISOString(),
   },
 ];
