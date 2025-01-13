@@ -1,72 +1,43 @@
-# Next PWA Starter with Supabase and Hono.js
+# Next.js PWA Starter
 
-## アーキテクチャ
+## タスク管理
 
-### フロントエンド
-- Next.js 15 (App Router)
-- React Server Components (RSC)
-- Suspense によるストリーミング
-- shadcn/ui コンポーネント
+プロジェクトのタスクは`.task`ファイルで管理されています。以下の主要なカテゴリがあります：
 
-### バックエンド
-- Hono.js による API ルーティング
-- Supabase によるデータ永続化
-- インメモリキャッシュ
+### 優先度
 
-## セットアップ手順
+1. セットアップ (Priority: 1)
+   - Supabaseの初期セットアップ
+2. 開発 (Priority: 2)
+   - ローカル環境管理
+   - 型定義管理
+3. データベース (Priority: 3)
+   - マイグレーション
+   - シードデータ
+4. デプロイ (Priority: 4)
+   - ステージング
+   - 本番環境
+5. メンテナンス (Priority: 5)
+   - ログ管理
+   - バックアップ
+   - CI/CD
 
-1. Supabaseプロジェクトの作成
-   - [Supabase Dashboard](https://supabase.com/dashboard)にアクセス
-   - "New Project"をクリック
-   - プロジェクト名: "next-pwa-starter"
-   - リージョン: Tokyo (asia-northeast1)
-   - データベースパスワード: 安全なパスワードを設定
+### 使用例
 
-2. テーブルの作成
-   - Supabaseダッシュボードの"SQL Editor"を開く
-   - `setup.sql`の内容をコピー&ペースト
-   - "Run"をクリック
+```bash
+# ローカル環境のセットアップ
+bun run supabase:setup
 
-3. 環境変数の設定
-   - `.env.example`をコピーして`.env.local`を作成
-   ```bash
-   cp .env.example .env.local
-   ```
-   - `.env.local`の各値を設定:
-     ```
-     NEXT_PUBLIC_SUPABASE_URL=your-project-url
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-     ```
+# 開発環境の起動
+bun run supabase:start
 
-4. 依存関係のインストール
-   ```bash
-   bun install
-   ```
+# マイグレーションの作成
+bun run supabase:migration:new add_users_table
 
-5. 開発サーバーの起動
-   ```bash
-   bun dev
-   ```
+# 型定義の生成
+bun run supabase:types
+```
 
-## 実装の特徴
+詳細なタスクの定義と手順については`.task`ファイルを参照してください。
 
-### サーバーサイドレンダリング
-- React Server Components (RSC)を活用
-- Suspenseによるストリーミング
-- 各セクションの並列データロード
-
-### APIルーティング
-- Hono.jsによる高速なAPIルーティング
-- インメモリキャッシュによるパフォーマンス最適化
-- Supabaseとの通信を集約
-
-### データモデル
-- features: プロジェクトの機能紹介
-- changelogs: 更新履歴
-- tech_stacks: 使用技術スタック
-
-## セキュリティに関する注意
-
-- 環境変数（`.env.local`）は決してGitにコミットしないでください
-- プロジェクトの公開リポジトリでは、`.env.example`のみをコミットし、実際の値は含めないようにしてください
-- Supabaseのプロジェクト設定やAPIキーは、信頼できる開発者とのみ共有してください
+[Previous README content...]
