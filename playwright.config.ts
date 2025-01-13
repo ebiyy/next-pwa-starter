@@ -1,39 +1,36 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: "./tests",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html'],
-    ['list']
-  ],
+  reporter: [["html"], ["list"]],
   use: {
-    baseURL: 'http://localhost:3000',
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    baseURL: "http://localhost:3000",
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
+    video: "retain-on-failure",
   },
   projects: [
     {
-      name: 'chromium',
-      use: { 
-        ...devices['Desktop Chrome'],
+      name: "chromium",
+      use: {
+        ...devices["Desktop Chrome"],
         viewport: { width: 1280, height: 720 },
       },
     },
     {
-      name: 'Mobile Chrome',
-      use: { 
-        ...devices['Pixel 5'],
+      name: "Mobile Chrome",
+      use: {
+        ...devices["Pixel 5"],
       },
     },
   ],
   webServer: {
-    command: 'bun run start',
-    url: 'http://localhost:3000',
+    command: "bun run dev",
+    url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },
