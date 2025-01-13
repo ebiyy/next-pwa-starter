@@ -10,6 +10,8 @@
 - hono.js
 - vercel
 - React.use
+- React Server Component
+- bun:test
 
 # Concept
 - Minimum Configuration
@@ -20,6 +22,7 @@
 - Consult node_modules when official documentation is not available or unclear
 - Keep documentation focused on product features, not development tasks
 - Utilize git history when refactoring documentation to preserve valuable information
+- Register frequently used commands in package.json scripts for easy access and consistency
 
 # shadcn/ui
 - bunx @shadcn/ui@latest add xxx
