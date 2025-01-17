@@ -1,0 +1,81 @@
+name: Lighthouseテストの安定性向上
+
+概要:
+- Lighthouseテストの実行が不安定で失敗する問題の解決
+- テスト結果の可読性向上
+- テスト実行の信頼性向上が必要
+
+実装フェーズ:
+
+### 1. サーバー管理の改善
+- [x] start-server-and-testの設定最適化
+  - コミット: `fix: start-server-and-testの設定を最適化`
+  - 対象ファイル:
+    - package.json
+    - tests/scripts/run-performance-tests.ts
+  - テスト:
+    - `test('サーバーが正常に起動し、テストが実行できる', () => {`
+    - `  // テストコード`
+    - `});`
+  - ロールバック:
+    - package.jsonの変更を元に戻す
+    - git reset --hard HEAD^
+
+### 2. Lighthouse設定の最適化
+- [x] Lighthouse実行オプションの調整
+  - コミット: `fix: Lighthouse実行オプションを最適化`
+  - 対象ファイル:
+    - tests/scripts/run-lighthouse.ts
+    - lighthouserc.json
+  - テスト:
+    - `test('Lighthouseが設定通りに実行される', () => {`
+    - `  // テストコード`
+    - `});`
+  - ロールバック:
+    - 設定ファイルを元に戻す
+    - git checkout HEAD^ tests/scripts/run-lighthouse.ts
+
+### 3. レポート形式の改善
+- [x] 人が読みやすいレポート形式の実装
+  - コミット: `feat: Lighthouseレポートの可読性を向上`
+  - 対象ファイル:
+    - tests/scripts/run-lighthouse.ts
+  - テスト:
+    - `test('レポートが指定された形式で出力される', () => {`
+    - `  // テストコード`
+    - `});`
+  - ロールバック:
+    - git checkout HEAD^ tests/scripts/run-lighthouse.ts
+
+規約:
+### テスト規約
+```typescript
+// テストファイル命名
+- パフォーマンステスト: *.performance.test.ts
+- Lighthouseテスト: run-lighthouse.ts
+
+// テスト構造
+describe('Lighthouse Tests', () => {
+  test('generates correct report format', () => {
+    // テストコード
+  });
+});
+```
+
+メンテナンス:
+### 定期的な確認項目
+- Lighthouseスコアの監視
+- レポート形式の妥当性確認
+- テスト実行時間の監視
+
+ロールバック戦略:
+### 問題発生時の対応
+- 設定ファイルのバックアップを保持
+- 前回の正常動作バージョンへの切り戻し
+- テスト結果の履歴管理
+
+注意事項:
+- テスト実行時のシステムリソース使用状況に注意
+- Chromeのヘッドレスモード設定の安定性確保
+- CI環境での実行時の特別な考慮
+- レポート保存先のディレクトリ構造の維持

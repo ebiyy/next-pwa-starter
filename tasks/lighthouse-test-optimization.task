@@ -1,0 +1,149 @@
+name: Lighthouseテストの最適化
+description: プロジェクトのタスクを作成する
+title: "[Task]: Lighthouseテストの最適化"
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Lighthouseテストの実行時間を最適化し、CI/CDパイプラインの効率を改善するためのタスク
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      value: "Lighthouseテストの最適化"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      value: |
+        - Lighthouseテストの実行に時間がかかりすぎている
+        - テスト実行の並列化が必要
+        - 重要なメトリクスのみに絞ったテスト実行が必要
+        - GitHub Actionsとの統合が最適化されていない
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      value: |
+        ### 1. 基盤整備
+        - [x] Lighthouse設定の最適化
+          - コミット: `perf: Lighthouse設定を最適化`
+          - 対象ファイル:
+            - lighthouserc.json
+          - 実装内容:
+            - スロットリング設定の調整
+            - スクリーンエミュレーションの明確化
+            - レポート管理の改善
+          - 結果:
+            - パフォーマンススコア: 100
+            - アクセシビリティスコア: 100
+            - ベストプラクティススコア: 100
+          - ロールバック:
+            - 設定ファイルの復元
+
+        ### 2. 機能実装
+        - [x] メトリクス最適化
+          - コミット: `perf: Lighthouseメトリクスを最適化`
+          - 対象ファイル:
+            - lighthouserc.json
+          - 実装内容:
+            - 重要なメトリクスの選定
+            - 測定基準の最適化
+          - 結果:
+            - First Contentful Paint: 0.3s（目標1.5s以内）
+            - Largest Contentful Paint: 0.4s
+            - Total Blocking Time: 0ms
+            - Cumulative Layout Shift: 0
+            - Speed Index: 0.3s
+          - ロールバック:
+            - 設定の復元
+
+        ### 3. CI/CD最適化
+        - [x] GitHub Actions統合
+          - コミット: `ci: Lighthouseテストのワークフロー最適化`
+          - 対象ファイル:
+            - .github/workflows/lighthouse.yml
+          - 実装内容:
+            - Lighthouse CIワークフローの作成
+            - レポートのアーティファクト保存
+            - 自動テスト実行の設定
+          - テスト:
+            - CI環境でのテスト実行確認
+          - ロールバック:
+            - ワークフローファイルの復元
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      value: |
+        ### テスト規約
+        ```typescript
+        // Lighthouse設定
+        {
+          "ci": {
+            "collect": {
+              "numberOfRuns": 1,  // 開発時は1回のみ
+              "startServerCommand": "bun run start",
+              "url": ["http://localhost:3000"]
+            },
+            "assert": {
+              "preset": "lighthouse:recommended",
+              "assertions": {
+                "categories:performance": ["error", {"minScore": 0.9}],
+                "categories:accessibility": ["error", {"minScore": 0.9}],
+                "categories:best-practices": ["error", {"minScore": 0.9}],
+                "first-contentful-paint": ["error", {"maxNumericValue": 1500}],
+                "interactive": ["error", {"maxNumericValue": 3000}]
+              }
+            }
+          }
+        }
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      value: |
+        ### テストの保守
+        ```typescript
+        // 定期的な確認項目
+        - パフォーマンススコアの監視（目標: 90以上）
+        - First Contentful Paint（目標: 1.5s以内）
+        - Time to Interactive（目標: 3s以内）
+        - レポート生成の確認
+        - CI/CDパイプラインの実行時間
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      value: |
+        ### テストによる検証
+        ```typescript
+        // ロールバック手順
+        1. 設定ファイルのバックアップを保持
+        2. git revertによる変更の取り消し
+        3. テスト実行による動作確認
+        4. メトリクスの検証
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      value: |
+        ### テストの注意点
+        - 開発環境では実行回数を最小限に抑える
+        - CI環境でのみ複数回実行する
+        - キャッシュを活用して実行時間を短縮
+        - 重要なメトリクスのみをテスト
+        - GitHub Actionsのキャッシュを活用
+        - プロダクションビルドでテストを実行する

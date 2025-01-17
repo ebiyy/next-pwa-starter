@@ -1,0 +1,160 @@
+name: Lighthouseモニタリングの実装と最適化
+description: プロジェクトのタスクを作成する
+title: "[Task]: Lighthouseモニタリングの実装と最適化"
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Lighthouseによるパフォーマンスモニタリングを実装し、CI/CDパイプラインを最適化するためのタスク
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      value: "Lighthouseモニタリングの実装と最適化"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      value: |
+        - 継続的なパフォーマンスモニタリングの実装
+        - GitHub Actionsでの自動実行体制の確立
+        - テスト実行の最適化による効率化
+        - 測定設定の最適化によるより正確な結果の取得
+        - 問題発生時の迅速な対応体制の確立
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      value: |
+        ### 1. モニタリング基盤の整備
+        - [ ] GitHub Actions設定の最適化
+          - コミット: `ci: Lighthouseモニタリングの基盤を整備`
+          - 対象ファイル:
+            - .github/workflows/lighthouse.yml
+          - 実装内容:
+            - 自動実行の設定
+            - 結果の保存設定
+            - 通知設定
+          - テスト:
+            - CIパイプラインでの動作確認
+          - ロールバック:
+            - git revert
+
+        ### 2. テスト実行の最適化
+        - [ ] Lighthouse設定の調整
+          - コミット: `perf: Lighthouseテスト実行を最適化`
+          - 対象ファイル:
+            - lighthouserc.json
+          - 実装内容:
+            - 実行回数の最適化
+            - キャッシュ設定
+            - 重要メトリクスの選定
+          - テスト:
+            - `test('設定が正しく適用される', () => {`
+            - `  // 設定テスト`
+            - `});`
+          - ロールバック:
+            - 設定ファイルの復元
+
+        ### 3. 測定精度の向上
+        - [ ] エミュレーション設定の最適化
+          - コミット: `perf: Lighthouse測定設定を最適化`
+          - 対象ファイル:
+            - lighthouserc.json
+          - 実装内容:
+            - スロットリング設定の調整
+            - スクリーンエミュレーションの設定
+            - 不要な監査のスキップ設定
+          - テスト:
+            - パフォーマンス指標の検証
+          - ロールバック:
+            - git checkout HEAD^ lighthouserc.json
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      value: |
+        ### パフォーマンス基準
+        ```typescript
+        // 目標値
+        const performanceTargets = {
+          score: 90,           // パフォーマンススコア
+          fcp: 1500,          // First Contentful Paint (ms)
+          tti: 3000,          // Time to Interactive (ms)
+          tbt: 300,           // Total Blocking Time (ms)
+          cls: 0.1,           // Cumulative Layout Shift
+          lcp: 2500           // Largest Contentful Paint (ms)
+        };
+
+        // 測定設定
+        const measurementConfig = {
+          runs: 1,            // 開発環境での実行回数
+          ciRuns: 3,          // CI環境での実行回数
+          device: 'desktop',  // デバイス設定
+          throttling: {
+            cpu: 1,
+            network: 1
+          }
+        };
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      value: |
+        ### 定期的な確認項目
+        ```typescript
+        // 監視項目
+        - パフォーマンススコア（90以上）
+        - First Contentful Paint（1.5s以内）
+        - Time to Interactive（3s以内）
+        - CI/CDパイプラインの実行時間
+        - システムリソース使用状況
+
+        // アラート設定
+        if (performanceScore < 90 || fcp > 1500 || tti > 3000) {
+          notifyTeam('パフォーマンス低下を検知');
+        }
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      value: |
+        ### 問題発生時の対応手順
+        ```typescript
+        // ロールバック手順
+        1. 設定変更の特定
+        2. git revertによる変更の取り消し
+        3. テスト実行による検証
+        4. メトリクスの確認
+
+        // 検証項目
+        test('ロールバック後のパフォーマンス確認', () => {
+          expect(getPerformanceScore()).toBeGreaterThan(90);
+          expect(getFCP()).toBeLessThan(1500);
+          expect(getTTI()).toBeLessThan(3000);
+        });
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      value: |
+        ### 実装時の注意点
+        - 開発環境では実行回数を最小限に抑える
+        - CI環境でのみ複数回実行する
+        - キャッシュを活用して実行時間を短縮
+        - 重要なメトリクスのみをテスト対象とする
+        - GitHub Actionsのキャッシュを効果的に活用
+        - プロダクションビルドでテストを実行
+        - システムリソースの使用状況に注意

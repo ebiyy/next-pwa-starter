@@ -14,12 +14,14 @@ export const techStackPresets = {
     name: "Next.js",
     description: "The React Framework for Production",
     doc_url: "https://nextjs.org/docs",
+    created_at: "2025-01-01T00:00:00Z",
   },
   backend: {
     category: "backend" as const,
     name: "Supabase",
     description: "Open source Firebase alternative",
     doc_url: "https://supabase.com/docs",
+    created_at: "2025-01-01T00:00:00Z",
   },
 };
 

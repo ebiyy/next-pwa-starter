@@ -13,26 +13,39 @@ interface WaitForServerOptions {
  * @param options 待機オプション
  */
 export async function waitForServer({
-  url = "http://localhost:3100",
-  timeout = 30000,
+  url = "http://localhost:3000",
+  timeout = 60000,
   interval = 1000,
   message = "Waiting for development server to start...",
 }: WaitForServerOptions = {}) {
   const startTime = Date.now();
+  let lastError: Error | null = null;
 
   while (Date.now() - startTime < timeout) {
     try {
       const response = await fetch(url);
       if (response.ok) {
+        // サーバー起動成功
+        process.stdout.write(`\n✓ Development server is ready at ${url}\n`);
         return true;
       }
-    } catch {
-      process.stdout.write(`\r${message}`);
-      await setTimeout(interval);
+      // レスポンスはあるがエラー
+      lastError = new Error(`Server responded with status ${response.status}`);
+    } catch (error) {
+      // 接続エラー（サーバーがまだ起動していない）
+      lastError = error as Error;
     }
+
+    // 経過時間を表示
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    process.stdout.write(`\r${message} (${elapsed}s)`);
+    await setTimeout(interval);
   }
 
-  throw new Error(`Server did not respond within ${timeout}ms`);
+  // タイムアウト時に最後のエラーを含めて詳細を表示
+  throw new Error(
+    `Server did not respond within ${timeout}ms.\nLast error: ${lastError?.message}`
+  );
 }
 
 /**

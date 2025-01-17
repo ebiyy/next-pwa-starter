@@ -1,0 +1,148 @@
+name: 統合テストの実装
+description: プロジェクトのタスクを作成する
+title: "[Task]: 統合テストの実装"
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        統合テストが実装されていない問題を解決するためのタスク
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      value: "統合テストの実装"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      value: |
+        - 統合テストディレクトリ（tests/integration）にテストファイルが存在しない
+        - APIエンドポイントやデータベース操作の統合テストが必要
+        - テストカバレッジの向上が必要
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      value: |
+        ### 1. 基盤整備
+        - [ ] 統合テストの基盤設定
+          - コミット: `test: 統合テストの基盤設定を追加`
+          - 対象ファイル:
+            - tests/integration/setup.ts
+          - テスト:
+            - `describe('統合テスト基盤', () => {`
+            - `  test('テスト環境が正しく設定されている', () => {`
+            - `    // 環境設定のテスト`
+            - `  });`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+        ### 2. 機能実装
+        - [ ] APIエンドポイントの統合テスト
+          - コミット: `test: APIエンドポイントの統合テストを追加`
+          - 対象ファイル:
+            - tests/integration/api/tech-stacks.test.ts
+            - tests/integration/api/features.test.ts
+            - tests/integration/api/changelogs.test.ts
+          - テスト:
+            - `test('APIエンドポイントが期待通りに動作する', () => {`
+            - `  // エンドポイントのテスト`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+        - [ ] データベース操作の統合テスト
+          - コミット: `test: データベース操作の統合テストを追加`
+          - 対象ファイル:
+            - tests/integration/db/tech-stacks.test.ts
+            - tests/integration/db/features.test.ts
+            - tests/integration/db/changelogs.test.ts
+          - テスト:
+            - `test('データベース操作が正しく機能する', () => {`
+            - `  // DB操作のテスト`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+        ### 3. テスト整備
+        - [ ] テストヘルパーの実装
+          - コミット: `test: 統合テスト用ヘルパー関数を追加`
+          - 対象ファイル:
+            - tests/integration/helpers/db-helper.ts
+            - tests/integration/helpers/api-helper.ts
+          - テスト:
+            - `test('ヘルパー関数が正しく機能する', () => {`
+            - `  // ヘルパーのテスト`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      value: |
+        ### テスト規約
+        ```typescript
+        // テストファイル命名
+        - 統合テスト: {機能名}.integration.test.ts
+
+        // テスト構造
+        describe('統合テスト > 機能カテゴリ', () => {
+          describe('サブカテゴリ', () => {
+            test('期待される動作', () => {
+              // テストコード
+            });
+          });
+        });
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      value: |
+        ### テストの保守
+        ```typescript
+        // 定期的な確認項目
+        test('データベース接続が正常に機能している', () => {
+          // DB接続テスト
+        });
+
+        test('APIエンドポイントが期待通りのレスポンスを返す', () => {
+          // APIテスト
+        });
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      value: |
+        ### テストによる検証
+        ```typescript
+        test('テストデータのクリーンアップが正常に機能する', () => {
+          // クリーンアップ処理のテスト
+        });
+
+        test('テストデータベースが正しい状態に保たれている', () => {
+          // DB状態の検証
+        });
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      value: |
+        ### テストの注意点
+        - テストデータベースを使用すること
+        - テストは独立して実行可能であること
+        - 各テスト実行後にデータをクリーンアップすること
+        - 実際のデータベース操作を含むため、トランザクションを適切に管理すること

@@ -16,10 +16,32 @@ export async function setupPWATest(page: Page): Promise<void> {
     waitUntil: "networkidle",
   });
 
-  // Service Workerの登録を待機
-  await page.waitForFunction(() => {
-    return navigator.serviceWorker.ready.then(() => true);
-  });
+  // Service Workerの登録を待機（30秒タイムアウト）
+  await page.waitForFunction(
+    () => {
+      return new Promise((resolve) => {
+        if (navigator.serviceWorker.controller) {
+          resolve(true);
+          return;
+        }
+
+        // 登録が完了するまで待機
+        navigator.serviceWorker.ready
+          .then(() => {
+            resolve(true);
+          })
+          .catch(() => {
+            resolve(false);
+          });
+
+        // バックグラウンドでの登録を待機
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          resolve(true);
+        });
+      });
+    },
+    { timeout: 30000 }
+  );
 }
 
 /**

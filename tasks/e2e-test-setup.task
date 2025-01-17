@@ -1,0 +1,149 @@
+name: E2Eテストの環境設定の改善
+description: プロジェクトのタスクを作成する
+title: "[Task]: E2Eテストの環境設定の改善"
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        E2Eテストの実行時にポートの競合が発生する問題を解決するためのタスク
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      value: "E2Eテストの環境設定の改善"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      value: |
+        - E2Eテスト実行時にポート3000が既に使用されている問題が発生
+        - テスト実行前の環境クリーンアップが必要
+        - テスト用の動的ポート割り当ての仕組みが必要
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      value: |
+        ### 1. 基盤整備
+        - [ ] テスト環境のクリーンアップスクリプト
+          - コミット: `test: テスト環境クリーンアップスクリプトを追加`
+          - 対象ファイル:
+            - tests/scripts/cleanup-test-env.ts
+          - テスト:
+            - `test('使用中のポートが正しくクリーンアップされる', () => {`
+            - `  // クリーンアップのテスト`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+        ### 2. 機能実装
+        - [ ] 動的ポート割り当ての実装
+          - コミット: `test: E2Eテスト用の動的ポート割り当てを実装`
+          - 対象ファイル:
+            - tests/e2e/helpers/port-helper.ts
+            - playwright.config.ts
+          - テスト:
+            - `test('動的ポート割り当てが正しく機能する', () => {`
+            - `  // ポート割り当てのテスト`
+            - `});`
+          - ロールバック:
+            - 変更の取り消し
+
+        - [ ] テスト実行前の環境チェック
+          - コミット: `test: テスト実行前の環境チェックを追加`
+          - 対象ファイル:
+            - tests/e2e/helpers/environment-helper.ts
+          - テスト:
+            - `test('環境チェックが正しく機能する', () => {`
+            - `  // 環境チェックのテスト`
+            - `});`
+          - ロールバック:
+            - ファイルの削除
+
+        ### 3. テスト整備
+        - [ ] テストヘルパーの改善
+          - コミット: `test: E2Eテストヘルパーの改善`
+          - 対象ファイル:
+            - tests/e2e/helpers/server-helper.ts
+            - tests/e2e/helpers/pwa-helper.ts
+          - テスト:
+            - `test('改善されたヘルパーが正しく機能する', () => {`
+            - `  // ヘルパーのテスト`
+            - `});`
+          - ロールバック:
+            - 変更の取り消し
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      value: |
+        ### テスト規約
+        ```typescript
+        // ポート管理
+        const getAvailablePort = async () => {
+          // 利用可能なポートを動的に検出
+        };
+
+        // 環境設定
+        beforeAll(async () => {
+          // テスト環境のセットアップ
+          // ポートの確保
+          // サーバーの起動
+        });
+
+        afterAll(async () => {
+          // 環境のクリーンアップ
+          // ポートの解放
+          // サーバーの停止
+        });
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      value: |
+        ### テストの保守
+        ```typescript
+        // 定期的な確認項目
+        test('テスト環境が正しくセットアップされている', () => {
+          // 環境チェック
+        });
+
+        test('ポートの解放が正しく行われている', () => {
+          // クリーンアップチェック
+        });
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      value: |
+        ### テストによる検証
+        ```typescript
+        test('環境のロールバックが正しく機能する', () => {
+          // ロールバック処理のテスト
+        });
+
+        test('ポート状態が正しく復元される', () => {
+          // 状態検証のテスト
+        });
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      value: |
+        ### テストの注意点
+        - テスト実行前に使用中のポートを確認すること
+        - 動的ポート割り当ては3000-3999の範囲で行うこと
+        - テスト終了後は必ずポートを解放すること
+        - 環境変数でポート設定を上書き可能にすること

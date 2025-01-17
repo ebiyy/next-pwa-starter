@@ -1,8 +1,20 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { apiClient } from "@/lib/api-client";
 import { cache } from "@/lib/cache";
+import {
+  cleanupTestDatabase,
+  setupTestDatabase,
+} from "../helpers/setup-test-db";
 
 describe("キャッシュ戦略のパフォーマンス検証", () => {
+  beforeAll(async () => {
+    await setupTestDatabase();
+  });
+
+  afterAll(async () => {
+    await cleanupTestDatabase();
+  });
+
   test("キャッシュの有無によるレスポンスタイムの比較", async () => {
     // キャッシュクリア
     await cache.clear();
@@ -31,41 +43,65 @@ describe("キャッシュ戦略のパフォーマンス検証", () => {
   });
 
   test("並列リクエスト時のキャッシュ効果", async () => {
-    // キャッシュクリア
-    await cache.clear();
+    const ITERATIONS = 3;
+    let totalTimeWithoutCache = 0;
+    let totalTimeWithCache = 0;
 
-    // 並列リクエストの実行（キャッシュなし）
-    const startParallelWithoutCache = performance.now();
-    await Promise.all([
-      apiClient.getTechStacks(),
-      apiClient.getFeatures(),
-      apiClient.getChangelogs(),
-    ]);
-    const timeParallelWithoutCache =
-      performance.now() - startParallelWithoutCache;
+    for (let i = 0; i < ITERATIONS; i++) {
+      // キャッシュクリア
+      await cache.clear();
 
-    // キャッシュクリア
-    await cache.clear();
+      // 並列リクエストの実行（キャッシュなし）
+      const startParallelWithoutCache = performance.now();
+      await Promise.all([
+        apiClient.getTechStacks(),
+        apiClient.getFeatures(),
+        apiClient.getChangelogs(),
+      ]);
+      const timeParallelWithoutCache =
+        performance.now() - startParallelWithoutCache;
 
-    // キャッシュの作成
-    await Promise.all([
-      apiClient.getTechStacks(),
-      apiClient.getFeatures(),
-      apiClient.getChangelogs(),
-    ]);
+      // キャッシュクリア
+      await cache.clear();
 
-    // 並列リクエストの実行（キャッシュあり）
-    const startParallelWithCache = performance.now();
-    await Promise.all([
-      apiClient.getTechStacks(),
-      apiClient.getFeatures(),
-      apiClient.getChangelogs(),
-    ]);
-    const timeParallelWithCache = performance.now() - startParallelWithCache;
+      // キャッシュの作成
+      await Promise.all([
+        apiClient.getTechStacks(),
+        apiClient.getFeatures(),
+        apiClient.getChangelogs(),
+      ]);
 
-    console.log(`並列実行（キャッシュなし）: ${timeParallelWithoutCache}ms`);
-    console.log(`並列実行（キャッシュあり）: ${timeParallelWithCache}ms`);
+      // 並列リクエストの実行（キャッシュあり）
+      const startParallelWithCache = performance.now();
+      await Promise.all([
+        apiClient.getTechStacks(),
+        apiClient.getFeatures(),
+        apiClient.getChangelogs(),
+      ]);
+      const timeParallelWithCache = performance.now() - startParallelWithCache;
 
-    expect(timeParallelWithCache).toBeLessThan(timeParallelWithoutCache);
+      totalTimeWithoutCache += timeParallelWithoutCache;
+      totalTimeWithCache += timeParallelWithCache;
+
+      console.log("\n実行 " + (i + 1) + "/" + ITERATIONS + ":");
+      console.log(
+        `並列実行（キャッシュなし）: ${timeParallelWithoutCache.toFixed(2)}ms`
+      );
+      console.log(
+        `並列実行（キャッシュあり）: ${timeParallelWithCache.toFixed(2)}ms`
+      );
+    }
+
+    const avgTimeWithoutCache = totalTimeWithoutCache / ITERATIONS;
+    const avgTimeWithCache = totalTimeWithCache / ITERATIONS;
+
+    console.log(`\n平均実行時間:`);
+    console.log(
+      `並列実行（キャッシュなし）: ${avgTimeWithoutCache.toFixed(2)}ms`
+    );
+    console.log(`並列実行（キャッシュあり）: ${avgTimeWithCache.toFixed(2)}ms`);
+
+    // キャッシュありの場合が20%以上速いことを期待
+    expect(avgTimeWithCache).toBeLessThan(avgTimeWithoutCache * 0.8);
   });
 });
