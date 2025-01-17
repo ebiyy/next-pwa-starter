@@ -50,9 +50,7 @@
       }
     },
     "upload": {
-      "target": "temporary-public-storage",
-      "githubToken": "$LHCI_GITHUB_APP_TOKEN",
-      "githubStatusContextSuffix": "performance"
+      "target": "temporary-public-storage"
     }
   }
 }

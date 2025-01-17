@@ -52,11 +52,7 @@ jobs:
           NODE_ENV: production
 
       - name: Run Lighthouse CI
-        run: |
-          mkdir -p .lighthouseci
-          chmod -R 777 .lighthouseci
-          echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
-          LHCI_GITHUB_APP_TOKEN="${{ secrets.GITHUB_TOKEN }}" bun run test:lighthouse
+        run: bun run test:lighthouse
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
