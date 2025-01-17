@@ -4,6 +4,7 @@ create table features (
   title text not null,
   description text not null,
   icon_name text not null, -- lucide-reactのアイコン名
+  doc_url text not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -20,7 +21,7 @@ create table changelogs (
 create table tech_stacks (
   id uuid default gen_random_uuid() primary key,
   name text not null,
-  category text not null, -- 'frontend', 'backend', 'testing', etc.
+  category text not null check (category in ('frontend', 'backend', 'testing', 'tooling')),
   description text not null,
   doc_url text not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
