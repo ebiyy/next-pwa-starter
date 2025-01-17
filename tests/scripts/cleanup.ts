@@ -6,6 +6,8 @@ import { resolve } from "node:path";
 const targets = [
   "tests/reports/playwright",
   "tests/reports/junit",
+  ".bun-cache/test",
+  "coverage",
   ".env.test",
   ".next-test.config.ts",
   "test-results",

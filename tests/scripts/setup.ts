@@ -1,13 +1,13 @@
 #!/usr/bin/env bun
 import { spawn } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 // 必要なディレクトリの作成
 const directories = [
   "tests/reports/playwright",
   "tests/reports/junit",
-  "tests/e2e/__snapshots__",
+  ".bun-cache/test",
 ];
 
 for (const dir of directories) {
@@ -26,7 +26,7 @@ async function setup() {
     console.log("📦 Playwrightのブラウザをインストールしています...");
     await new Promise<void>((resolve, reject) => {
       const install = spawn(
-        "npx",
+        "bunx",
         ["playwright", "install", "--with-deps", "chromium"],
         {
           stdio: "inherit",

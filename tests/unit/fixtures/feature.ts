@@ -1,7 +1,7 @@
 import type { Feature } from "@/types/schema";
 
 export const mockFeature: Feature = {
-  id: 1,
+  id: "1",
   title: "Next.js 15",
   description: "App RouterとReact Server Components",
   icon_name: "code",
@@ -12,7 +12,7 @@ export const mockFeature: Feature = {
 export const mockFeatures: Feature[] = [
   mockFeature,
   {
-    id: 2,
+    id: "2",
     title: "Supabase",
     description: "認証とデータベース",
     icon_name: "database",
@@ -20,7 +20,7 @@ export const mockFeatures: Feature[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: 3,
+    id: "3",
     title: "PWA対応",
     description: "オフライン対応とモバイルファーストな設計",
     icon_name: "smartphone",
