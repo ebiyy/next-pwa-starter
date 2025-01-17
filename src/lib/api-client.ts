@@ -32,7 +32,7 @@ class HonoApiClient implements ApiClient {
   constructor() {
     this.baseUrl = process.env.VERCEL_URL
       ? `https://${process.env.VERCEL_URL}/api`
-      : "http://localhost:3000/api";
+      : "http://localhost:3100/api";
   }
 
   async getFeatures(): Promise<Feature[]> {

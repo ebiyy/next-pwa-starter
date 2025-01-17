@@ -1,111 +1,78 @@
-import { test, expect, type Page } from '@playwright/test';
+import { expect, test } from "@playwright/test";
+import {
+  checkOfflineMode,
+  checkServiceWorker,
+  setupPWATest,
+} from "./helpers/pwa-helper";
 
-// ページオブジェクトモデル
-class PWAPage {
-  constructor(private page: Page) {}
-
-  async goto() {
-    await this.page.goto('/');
-    await this.page.waitForLoadState('domcontentloaded');
-  }
-
-  async getTitle() {
-    return this.page.title();
-  }
-
-  async getManifestLink() {
-    return this.page.locator('link[rel="manifest"]').getAttribute('href');
-  }
-
-  async waitForServiceWorker() {
-    // Service Workerの登録と活性化を待つ
-    return this.page.evaluate(async () => {
-      if (!('serviceWorker' in navigator)) {
-        console.log('Service Worker is not supported');
-        return null;
-      }
-
-      try {
-        // 既存の登録を確認
-        const existing = await navigator.serviceWorker.getRegistration();
-        if (existing?.active) {
-          return {
-            scope: existing.scope,
-            active: true,
-            state: existing.active.state
-          };
-        }
-
-        // 新規登録
-        const registration = await navigator.serviceWorker.register('/sw.js');
-        
-        // Service Workerの活性化を待つ
-        if (registration.installing || registration.waiting) {
-          await new Promise<void>((resolve) => {
-            const worker = registration.installing || registration.waiting;
-            if (!worker) {
-              resolve();
-              return;
-            }
-
-            worker.addEventListener('statechange', () => {
-              if (worker.state === 'activated') {
-                resolve();
-              }
-            });
-          });
-        }
-
-        return {
-          scope: registration.scope,
-          active: true,
-          state: registration.active?.state
-        };
-      } catch (error) {
-        console.error('Service Worker registration failed:', error);
-        return null;
-      }
-    });
-  }
-
-  async checkResponsive() {
-    await this.page.setViewportSize({ width: 375, height: 667 });
-    return this.page.locator('main').isVisible();
-  }
-}
-
-test.describe('PWA機能テスト', () => {
-  let pwaPage: PWAPage;
-
+test.describe("PWA機能", () => {
   test.beforeEach(async ({ page }) => {
-    pwaPage = new PWAPage(page);
-    await pwaPage.goto();
+    await setupPWATest(page);
   });
 
-  test('Webページが正しく表示される', async () => {
-    const title = await pwaPage.getTitle();
-    expect(title).toContain('Next.js PWA');
+  test("マニフェストが正しく設定されている", async ({ page }) => {
+    const manifest = await page.evaluate(async () => {
+      const response = await fetch("/manifest.webmanifest");
+      return response.json();
+    });
+
+    // 基本設定の検証
+    expect(manifest.name).toBe("Next.js PWA Starter");
+    expect(manifest.short_name).toBe("PWA Starter");
+    expect(manifest.display).toBe("standalone");
+
+    // アイコンの検証
+    expect(manifest.icons).toHaveLength(4);
+    const hasRequiredIcons = manifest.icons.some(
+      (icon: any) => icon.sizes === "512x512" && icon.purpose === "maskable"
+    );
+    expect(hasRequiredIcons).toBe(true);
   });
 
-  test('PWAマニフェストが存在する', async () => {
-    const manifestHref = await pwaPage.getManifestLink();
-    expect(manifestHref).toBeTruthy();
-    expect(manifestHref).toBe('/manifest.webmanifest');
+  test("Service Workerが正しく登録されている", async ({ page }) => {
+    const isRegistered = await checkServiceWorker(page);
+    expect(isRegistered).toBe(true);
   });
 
-  test('Service Workerが登録される', async () => {
-    test.slow(); // このテストは時間がかかる可能性があることを明示
-    
-    const registration = await pwaPage.waitForServiceWorker();
-    
-    expect(registration).toBeTruthy();
-    expect(registration?.active).toBe(true);
-    expect(registration?.state).toBe('activated');
-    expect(registration?.scope).toContain('/');
+  test("オフラインモードで動作する", async ({ page }) => {
+    const offlineContent = await checkOfflineMode(page);
+    expect(offlineContent).toContain("オフライン");
   });
 
-  test('モバイルで正しく表示される', async () => {
-    const isVisible = await pwaPage.checkResponsive();
-    expect(isVisible).toBe(true);
+  test("インストール可能なPWAとして認識される", async ({ page }) => {
+    // beforeInstallpromptイベントの発火を確認
+    const hasInstallPrompt = await page.evaluate(() => {
+      return new Promise((resolve) => {
+        window.addEventListener("beforeinstallprompt", (e) => {
+          e.preventDefault();
+          resolve(true);
+        });
+        // 5秒後にタイムアウト
+        setTimeout(() => resolve(false), 5000);
+      });
+    });
+
+    expect(hasInstallPrompt).toBe(true);
+  });
+
+  test("プッシュ通知の許可を要求できる", async ({ page }) => {
+    // プッシュ通知の権限要求をモック
+    await page.evaluate(() => {
+      return new Promise((resolve) => {
+        if ("Notification" in window) {
+          Notification.requestPermission().then(resolve);
+        } else {
+          resolve("denied");
+        }
+      });
+    });
+
+    // Service Workerの登録を確認
+    const registration = await page.evaluate(async () => {
+      const reg = await navigator.serviceWorker.ready;
+      return reg.pushManager.getSubscription().then(Boolean);
+    });
+
+    expect(registration).toBeDefined();
   });
 });

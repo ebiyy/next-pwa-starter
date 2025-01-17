@@ -1,5 +1,5 @@
 export interface Feature {
-  id: string;
+  id: number;
   title: string;
   description: string;
   icon_name: string;
@@ -8,20 +8,20 @@ export interface Feature {
 }
 
 export interface Changelog {
-  id: string;
+  id: number;
   version: string;
   description: string;
   release_date: string;
   is_major: boolean;
 }
 
+export type TechStackCategory = "frontend" | "backend" | "testing" | "tooling";
+
 export interface TechStack {
-  id: string;
+  id: number;
   name: string;
-  category: string;
+  category: TechStackCategory;
   description: string;
   doc_url: string;
   created_at: string;
 }
-
-export type TechStackCategory = "frontend" | "backend" | "testing" | "tooling";

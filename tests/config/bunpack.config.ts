@@ -30,6 +30,30 @@ interface BunpackConfig {
   timeout: number;
   // テストの並列実行設定
   workers: number | "auto";
+  // キャッシュ設定
+  cache: {
+    // キャッシュの有効化
+    enabled: boolean;
+    // キャッシュディレクトリ
+    directory: string;
+    // キャッシュの有効期限（秒）
+    ttl: number;
+  };
+  // パフォーマンス設定
+  performance: {
+    // 並列実行の最大数
+    maxParallel: number;
+    // テストのシャーディング（CI用）
+    sharding: {
+      enabled: boolean;
+      // 総シャード数
+      total: number;
+      // 現在のシャード番号
+      current: number;
+    };
+    // テストの実行順序の最適化
+    optimizeOrder: boolean;
+  };
 }
 
 const config: BunpackConfig = {
@@ -57,6 +81,20 @@ const config: BunpackConfig = {
   },
   timeout: 10000,
   workers: "auto",
+  cache: {
+    enabled: true,
+    directory: ".bun-cache/test",
+    ttl: 3600, // 1時間
+  },
+  performance: {
+    maxParallel: process.env.CI ? 2 : 4,
+    sharding: {
+      enabled: !!process.env.CI,
+      total: Number(process.env.SHARDS_TOTAL || 1),
+      current: Number(process.env.SHARD_NUMBER || 0),
+    },
+    optimizeOrder: true,
+  },
 };
 
 // 環境変数ファイルの読み込み
@@ -76,10 +114,21 @@ function loadEnvFiles() {
   }
 }
 
+// キャッシュディレクトリの作成
+function ensureCacheDirectory() {
+  const cacheDir = resolve(process.cwd(), config.cache.directory);
+  if (!existsSync(cacheDir)) {
+    require("node:fs").mkdirSync(cacheDir, { recursive: true });
+  }
+}
+
 // 設定の適用
 export function applyConfig() {
   loadEnvFiles();
   Object.assign(process.env, config.env.variables);
+  if (config.cache.enabled) {
+    ensureCacheDirectory();
+  }
 }
 
 export default config;

@@ -1,0 +1,94 @@
+mock:
+  strategy:
+    initial:
+      stack:
+        - supabase: データ層とモックデータの基盤
+        - hono: APIルーティングとレスポンス
+        - bun: テスト実行環境
+      benefits:
+        - シンプルな実装
+        - 型の自動生成
+        - 高速な開発
+    
+    scale:
+      stack:
+        - drizzle: 必要に応じて追加
+      timing: 以下の場合に導入を検討
+        - 複雑なマイグレーションが必要
+        - 高度なクエリが必要
+        - リレーションの管理が複雑化
+
+  implementation:
+    directory:
+      src/lib/mock-data:
+        - index.ts: モックデータのエントリーポイント
+        - tech-stacks.ts: 技術スタックのモックデータ
+        - features.ts: 機能のモックデータ
+        - changelogs.ts: 変更履歴のモックデータ
+    
+    tests/factories:
+      - tech-stack.factory.ts: 技術スタックのファクトリー
+      - feature.factory.ts: 機能のファクトリー
+      - changelog.factory.ts: 変更履歴のファクトリー
+
+  data_flow:
+    type_definition:
+      source: supabase
+      process:
+        - スキーマからの型自動生成
+        - schema.tsへの型エクスポート
+    
+    mock_data:
+      development:
+        - src/lib/mock-dataディレクトリのデータを使用
+        - Supabaseのローカル環境で永続化
+      
+      testing:
+        - tests/factoriesのファクトリーを使用
+        - テストケースごとにデータを生成
+        - Bunのテストランナーで高速実行
+
+  migration_path:
+    phase1:
+      - Supabaseの型生成を活用
+      - シンプルなCRUD操作の実装
+      - 基本的なモックデータの整備
+    
+    phase2:
+      - 必要に応じてDrizzleを導入
+      - マイグレーション管理の強化
+      - より複雑なクエリの実装
+
+  conventions:
+    naming:
+      files:
+        - モックデータ: {entity}.ts
+        - ファクトリー: {entity}.factory.ts
+        - テスト: {entity}.test.ts
+      
+      functions:
+        - ファクトリー: create{Entity}
+        - リスト生成: create{Entity}List
+        - プリセット: {entity}Presets
+    
+    structure:
+      mock_data:
+        - エンティティごとに個別ファイル
+        - index.tsでまとめてエクスポート
+        - 型定義との一貫性を維持
+      
+      factories:
+        - Fakerを使用したデータ生成
+        - オーバーライド可能な設計
+        - プリセットの提供
+
+  maintenance:
+    type_sync:
+      - Supabaseの型生成を定期実行
+      - CIでの型チェック
+      - 型の不一致を早期発見
+    
+    testing:
+      - モックデータの整合性テスト
+      - ファクトリーの動作テスト
+      - APIレスポンスの型チェック

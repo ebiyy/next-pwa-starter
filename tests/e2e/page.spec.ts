@@ -1,81 +1,191 @@
 import { expect, test } from "@playwright/test";
+import { PageHelper } from "./helpers/pwa-helper";
+import { waitForServer } from "./helpers/server-helper";
 
 test.describe("ホームページ", () => {
-  test("初期表示とアニメーション", async ({ page }) => {
-    await page.goto("/");
+  let pageHelper: PageHelper;
+
+  test.beforeAll(async () => {
+    // 開発サーバーの起動を待機
+    await waitForServer({
+      message: "Next.js開発サーバーの起動を待機中...",
+      timeout: 60000, // 1分
+    });
+  });
+
+  test.beforeEach(async ({ page }) => {
+    pageHelper = new PageHelper(page);
+    await pageHelper.goto();
+  });
+
+  test("初期表示とアニメーション", async () => {
+    const hero = await pageHelper.getHeroSection();
 
     // ヒーローセクションの表示確認
-    const hero = page.getByText("Build Amazing Apps");
-    await expect(hero).toBeVisible();
-
-    // サブタイトルの表示確認
-    const subtitle = page.getByText(
-      "モダンなWeb開発のためのスターターテンプレート。"
-    );
-    await expect(subtitle).toBeVisible();
-
-    // バージョンバッジの表示確認
-    const versionBadge = page.getByText("v1.0.0 Now Available");
-    await expect(versionBadge).toBeVisible();
+    expect(await hero.title.isVisible()).toBe(true);
+    expect(await hero.subtitle.isVisible()).toBe(true);
+    expect(await hero.versionBadge.isVisible()).toBe(true);
 
     // テーマ切り替えボタンの表示確認
-    const themeButton = page.getByRole("button", {
-      name: "テーマを切り替える",
-    });
-    await expect(themeButton).toBeVisible();
+    const themeButton = await pageHelper.getThemeButton();
+    expect(await themeButton.isVisible()).toBe(true);
 
     // アニメーションの完了を待機
-    await page.waitForTimeout(1000);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
   test("テーマ切り替え機能", async ({ page }) => {
-    await page.goto("/");
+    // テーマの初期化を待つ
+    await page.waitForFunction(() => {
+      const html = document.documentElement;
+      return (
+        html.classList.contains("light") || html.classList.contains("dark")
+      );
+    });
 
     // デフォルトはライトテーマ
-    await expect(page.locator("html")).not.toHaveClass(/dark/);
+    const html = page.locator("html");
+    expect(await html.getAttribute("class")).toMatch(/light/);
+    expect(await html.getAttribute("class")).not.toMatch(/dark/);
 
     // テーマ切り替えボタンをクリック
-    const themeButton = page.getByRole("button", {
-      name: "テーマを切り替える",
-    });
+    const themeButton = await pageHelper.getThemeButton();
     await themeButton.click();
 
     // ダークテーマに切り替わったことを確認
-    await expect(page.locator("html")).toHaveClass(/dark/);
+    await page.waitForSelector("html.dark");
+    expect(await html.getAttribute("class")).toMatch(/dark/);
   });
 
-  test("フィーチャーとチェンジログの表示", async ({ page }) => {
-    await page.goto("/");
-
+  test("フィーチャーとチェンジログの表示", async () => {
     // Featuresセクションの確認
-    await expect(page.getByRole("heading", { name: "Features" })).toBeVisible();
-    await expect(page.getByText("Next.js 15")).toBeVisible();
-    await expect(page.getByText("Supabase")).toBeVisible();
-    await expect(page.getByText("PWA対応")).toBeVisible();
+    const features = await pageHelper.getFeaturesSection();
+    expect(await features.heading.isVisible()).toBe(true);
+    expect(await features.nextjs.isVisible()).toBe(true);
+    expect(await features.supabase.isVisible()).toBe(true);
+    expect(await features.pwa.isVisible()).toBe(true);
 
     // Changelogセクションの確認
-    await expect(
-      page.getByRole("heading", { name: "Changelog" })
-    ).toBeVisible();
-    await expect(page.getByText("2.0.0")).toBeVisible();
-    await expect(page.getByText(/Next.js 15とTurbopackの統合/)).toBeVisible();
+    const changelog = await pageHelper.getChangelogSection();
+    expect(await changelog.heading.isVisible()).toBe(true);
+    expect(await changelog.version.isVisible()).toBe(true);
+    expect(await changelog.description.isVisible()).toBe(true);
   });
 
-  test("レスポンシブ対応", async ({ page }) => {
-    // モバイルビュー
-    await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/");
+  test("レスポンシブ対応", async () => {
+    const layout = await pageHelper.checkResponsiveLayout();
 
-    // フィーチャーカードが1列になっていることを確認
-    const featureCards = page.locator(".grid-cols-1");
-    await expect(featureCards).toBeVisible();
+    // モバイルビュー
+    expect(await layout.mobile()).toBe(true);
 
     // タブレットビュー
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await expect(page.locator(".md\\:grid-cols-2")).toBeVisible();
+    expect(await layout.tablet()).toBe(true);
 
     // デスクトップビュー
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await expect(page.locator(".lg\\:grid-cols-3")).toBeVisible();
+    expect(await layout.desktop()).toBe(true);
+  });
+
+  test.describe("ビジュアルリグレッションテスト", () => {
+    test("フィーチャーカードの表示（ライトモード）", async ({ page }) => {
+      // テーマの初期化を待つ
+      await page.waitForFunction(() => {
+        const html = document.documentElement;
+        return html.classList.contains("light");
+      });
+
+      // ビューポートサイズを設定
+      await page.setViewportSize({ width: 992, height: 800 });
+
+      // フィーチャーカードの表示確認
+      const featureCards = page.locator(
+        ".grid-cols-1, .md\\:grid-cols-2, .lg\\:grid-cols-3"
+      );
+      expect(await featureCards.isVisible()).toBe(true);
+
+      // ホバー状態の確認
+      const firstCard = page.locator(".grid-cols-1 > div").first();
+      await firstCard.hover();
+      expect(await firstCard.isVisible()).toBe(true);
+
+      // スクリーンショットの領域を設定
+      const cardContainer = page.locator(".grid-cols-1");
+      const box = await cardContainer.boundingBox();
+      if (!box) throw new Error("カードコンテナが見つかりません");
+
+      // スナップショットの取得（特定の領域のみ）
+      await expect(page.locator(".grid-cols-1")).toHaveScreenshot(
+        "feature-cards-light.png"
+      );
+    });
+
+    test("フィーチャーカードの表示（ダークモード）", async ({ page }) => {
+      // テーマの初期化を待つ
+      await page.waitForFunction(() => {
+        const html = document.documentElement;
+        return html.classList.contains("light");
+      });
+
+      // ビューポートサイズを設定
+      await page.setViewportSize({ width: 992, height: 800 });
+
+      // ダークモードに切り替え
+      const themeButton = await pageHelper.getThemeButton();
+      await themeButton.click();
+
+      // ダークモードの適用を待つ
+      await page.waitForSelector("html.dark");
+      const html = page.locator("html");
+      expect(await html.getAttribute("class")).toMatch(/dark/);
+
+      // フィーチャーカードの表示確認
+      const featureCards = page.locator(
+        ".grid-cols-1, .md\\:grid-cols-2, .lg\\:grid-cols-3"
+      );
+      expect(await featureCards.isVisible()).toBe(true);
+
+      // ホバー状態の確認
+      const firstCard = page.locator(".grid-cols-1 > div").first();
+      await firstCard.hover();
+      expect(await firstCard.isVisible()).toBe(true);
+
+      // スクリーンショットの領域を設定
+      const cardContainer = page.locator(".grid-cols-1");
+      const box = await cardContainer.boundingBox();
+      if (!box) throw new Error("カードコンテナが見つかりません");
+
+      // スナップショットの取得（特定の領域のみ）
+      await expect(page.locator(".grid-cols-1")).toHaveScreenshot(
+        "feature-cards-dark.png"
+      );
+    });
+
+    test("レスポンシブ表示の確認", async ({ page }) => {
+      // テーマの初期化を待つ
+      await page.waitForFunction(() => {
+        const html = document.documentElement;
+        return html.classList.contains("light");
+      });
+
+      // モバイル
+      await page.setViewportSize({ width: 375, height: 667 });
+      expect(await page.locator("main").isVisible()).toBe(true);
+      await expect(page.locator("main")).toHaveScreenshot(
+        "responsive-mobile.png"
+      );
+
+      // タブレット
+      await page.setViewportSize({ width: 768, height: 1024 });
+      expect(await page.locator("main").isVisible()).toBe(true);
+      await expect(page.locator("main")).toHaveScreenshot(
+        "responsive-tablet.png"
+      );
+
+      // デスクトップ
+      await page.setViewportSize({ width: 1280, height: 800 });
+      expect(await page.locator("main").isVisible()).toBe(true);
+      await expect(page.locator("main")).toHaveScreenshot(
+        "responsive-desktop.png"
+      );
+    });
   });
 });
