@@ -4,37 +4,96 @@
     "config:base",
     ":timezone(Asia/Tokyo)",
     ":label(dependencies)",
-    "schedule:weekly"
+    "schedule:weekly",
+    ":maintainLockFilesWeekly",
+    ":prImmediately",
+    ":semanticCommits",
+    ":enableVulnerabilityAlertsWithLabel(security)"
   ],
+  "rangeStrategy": "bump",
   "packageRules": [
     {
+      "description": "自動マージする依存関係の設定",
       "matchPackagePatterns": ["*"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "all non-major dependencies",
       "groupSlug": "all-minor-patch",
       "automerge": true,
-      "labels": ["dependencies", "automerge"]
+      "labels": ["dependencies", "automerge"],
+      "stabilityDays": 3
     },
     {
+      "description": "メジャーアップデートの設定",
       "matchPackagePatterns": ["*"],
       "matchUpdateTypes": ["major"],
       "labels": ["dependencies", "major"]
+    },
+    {
+      "description": "Next.jsの依存関係グループ",
+      "groupName": "next.js",
+      "matchPackageNames": ["next", "@types/next"],
+      "matchPackagePatterns": ["^@next/*"],
+      "labels": ["next.js"]
+    },
+    {
+      "description": "Reactの依存関係グループ",
+      "groupName": "react",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "labels": ["react"]
+    },
+    {
+      "description": "shadcn/uiの依存関係グループ",
+      "groupName": "shadcn-ui",
+      "matchPackagePatterns": ["^@radix-ui/*", "^@shadcn/*"],
+      "labels": ["shadcn-ui"]
+    },
+    {
+      "description": "テスト関連の依存関係グループ",
+      "groupName": "testing",
+      "matchPackageNames": ["@playwright/test"],
+      "matchPackagePatterns": ["^@testing-library/*"],
+      "labels": ["testing"]
+    },
+    {
+      "description": "Supabaseの依存関係グループ",
+      "groupName": "supabase",
+      "matchPackagePatterns": ["^@supabase/*"],
+      "labels": ["supabase"]
     }
   ],
-  "ignorePaths": ["**/node_modules/**"],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/test/fixtures/**",
+    "**/tests/fixtures/**"
+  ],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
   "branchPrefix": "deps/",
   "commitMessagePrefix": "⬆️",
+  "commitMessage": "⬆️ {{{groupName}}}の依存関係をアップデート",
+  "commitMessageAction": "依存関係をアップデート：",
+  "commitMessageTopic": "{{{groupName}}}",
+  "commitMessageExtra": "{{#if isMajor}}メジャーバージョン{{else}}{{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}{{/if}}へアップデート",
   "labels": ["dependencies"],
   "reviewers": ["ebiyy"],
   "assignees": ["ebiyy"],
   "vulnerabilityAlerts": {
     "labels": ["security"],
-    "assignees": ["ebiyy"]
+    "assignees": ["ebiyy"],
+    "prPriority": 1
   },
   "lockFileMaintenance": {
     "enabled": true,
-    "schedule": ["before 10am on monday"]
-  }
+    "schedule": ["before 10am on monday"],
+    "labels": ["lock-file-maintenance"],
+    "commitMessageAction": "📦 ロックファイルをメンテナンス"
+  },
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "📦 依存関係の更新ダッシュボード",
+  "minimumReleaseAge": "3 days"
 }
