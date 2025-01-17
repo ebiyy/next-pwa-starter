@@ -47,9 +47,10 @@ jobs:
           NODE_ENV: production
 
       - name: Run Lighthouse CI
-        run: bun run test:lighthouse
+        run: |
+          echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
+          LHCI_GITHUB_APP_TOKEN="${{ secrets.GITHUB_TOKEN }}" bun run test:lighthouse
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NODE_ENV: production
@@ -59,6 +60,8 @@ jobs:
         with:
           name: lighthouse-results
           path: .lighthouseci
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Notify on failure
         if: failure()
