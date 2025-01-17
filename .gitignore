@@ -44,3 +44,8 @@ next-env.d.ts
 # test
 playwright-report
 test-results
+
+# Test reports
+tests/reports/
+tests/e2e/__snapshots__/
+.lighthouseci/
