@@ -1,4 +1,8 @@
-import { mockTechStacks } from "@/lib/mock-data";
+import {
+  createTechStack,
+  createTechStackList,
+  techStackPresets,
+} from "../factories/tech-stack.factory";
 import { recordTestTiming, startSuite } from "../helpers/test-reporter";
 import { assertResponse, request, setupAPITest } from "./setup";
 
@@ -9,53 +13,56 @@ describe("Tech Stacks API", () => {
   startSuite("Tech Stacks API");
 
   test("GET /api/tech-stacks should return all tech stacks", async () => {
+    const expectedStacks = [
+      createTechStack({ ...techStackPresets.frontend, id: 1 }),
+      createTechStack({ ...techStackPresets.backend, id: 2 }),
+    ];
+
     const { response, data } = await request(`${baseUrl}/tech-stacks`);
 
     assertResponse.ok(response);
-    expect(data).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: "Next.js",
-          category: "frontend",
-          doc_url: "https://nextjs.org",
-        }),
-        expect.objectContaining({
-          name: "Supabase",
-          category: "backend",
-          doc_url: "https://supabase.com",
-        }),
-      ])
+    expect(data).toMatchObject(
+      expectedStacks.map((stack) => ({
+        ...stack,
+        created_at: expect.any(String),
+      }))
     );
     recordTestTiming("GET /api/tech-stacks");
   });
 
   test("GET /api/tech-stacks/:category should return filtered tech stacks", async () => {
     // フロントエンドのみ取得
+    const frontendStack = createTechStack({
+      ...techStackPresets.frontend,
+      id: 1,
+    });
     const { response: frontendResponse, data: frontendData } = await request(
       `${baseUrl}/tech-stacks/frontend`
     );
 
     assertResponse.ok(frontendResponse);
-    expect(frontendData).toEqual([
-      expect.objectContaining({
-        name: "Next.js",
-        category: "frontend",
-        doc_url: "https://nextjs.org",
-      }),
+    expect(frontendData).toMatchObject([
+      {
+        ...frontendStack,
+        created_at: expect.any(String),
+      },
     ]);
 
     // バックエンドのみ取得
+    const backendStack = createTechStack({
+      ...techStackPresets.backend,
+      id: 2,
+    });
     const { response: backendResponse, data: backendData } = await request(
       `${baseUrl}/tech-stacks/backend`
     );
 
     assertResponse.ok(backendResponse);
-    expect(backendData).toEqual([
-      expect.objectContaining({
-        name: "Supabase",
-        category: "backend",
-        doc_url: "https://supabase.com",
-      }),
+    expect(backendData).toMatchObject([
+      {
+        ...backendStack,
+        created_at: expect.any(String),
+      },
     ]);
     recordTestTiming("GET /api/tech-stacks/:category");
   });
@@ -98,5 +105,19 @@ describe("Tech Stacks API", () => {
     // キャッシュされたリクエストの方が高速であることを確認
     expect(cacheDuration).toBeLessThan(firstDuration);
     recordTestTiming("Cache test - filtered tech stacks");
+  });
+
+  test("should handle tech stack data structure", async () => {
+    const { response, data } = await request(`${baseUrl}/tech-stacks`);
+
+    assertResponse.ok(response);
+    expect(data[0]).toMatchObject({
+      id: expect.any(Number),
+      name: expect.any(String),
+      category: expect.stringMatching(/^(frontend|backend|testing|tooling)$/),
+      description: expect.any(String),
+      doc_url: expect.any(String),
+      created_at: expect.any(String),
+    });
   });
 });
