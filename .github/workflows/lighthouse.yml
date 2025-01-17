@@ -6,7 +6,12 @@ on:
   pull_request:
     branches: [main]
 
-permissions: write-all
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+  issues: write
+  statuses: write
 
 jobs:
   lighthouse:
@@ -48,6 +53,8 @@ jobs:
 
       - name: Run Lighthouse CI
         run: |
+          mkdir -p .lighthouseci
+          chmod -R 777 .lighthouseci
           echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
           LHCI_GITHUB_APP_TOKEN="${{ secrets.GITHUB_TOKEN }}" bun run test:lighthouse
         env:
