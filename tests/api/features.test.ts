@@ -1,40 +1,30 @@
+import {
+  createFeature,
+  createFeatureList,
+  featurePresets,
+} from "../factories/feature.factory";
 import { assertResponse, request, setupAPITest } from "./setup";
 
 const { describe, test, expect, context } = setupAPITest();
 const { baseUrl } = context;
 
-// モックデータ
-const mockFeatures = [
-  {
-    id: 1,
-    title: "Next.js 15",
-    description:
-      "App RouterとServer Componentsによる最新のReactアプリケーション開発",
-    icon: "🚀",
-    created_at: expect.any(String),
-  },
-  {
-    id: 2,
-    title: "Supabase",
-    description: "オープンソースのFirebase代替。認証やデータベースを簡単に実装",
-    icon: "🗄️",
-    created_at: expect.any(String),
-  },
-  {
-    id: 3,
-    title: "PWA対応",
-    description: "Progressive Web Appとしてインストール可能",
-    icon: "📱",
-    created_at: expect.any(String),
-  },
-];
-
 describe("Features API", () => {
   test("GET /api/features should return features list", async () => {
+    const expectedFeatures = [
+      createFeature({ ...featurePresets.pwa, id: 1 }),
+      createFeature({ ...featurePresets.serverComponents, id: 2 }),
+      createFeature({ id: 3 }),
+    ];
+
     const { response, data } = await request(`${baseUrl}/features`);
 
     assertResponse.ok(response);
-    expect(data).toEqual(mockFeatures);
+    expect(data).toMatchObject(
+      expectedFeatures.map((feature) => ({
+        ...feature,
+        created_at: expect.any(String),
+      }))
+    );
   });
 
   test("Cache should work for features", async () => {
@@ -53,5 +43,20 @@ describe("Features API", () => {
 
     // キャッシュされたリクエストの方が高速であることを確認
     expect(cacheDuration).toBeLessThan(firstDuration);
+  });
+
+  test("should handle feature data structure", async () => {
+    const { response, data } = await request(`${baseUrl}/features`);
+
+    assertResponse.ok(response);
+    expect(data).toHaveLength(5);
+    expect(data[0]).toMatchObject({
+      id: expect.any(Number),
+      title: expect.any(String),
+      description: expect.any(String),
+      icon_name: expect.any(String),
+      doc_url: expect.any(String),
+      created_at: expect.any(String),
+    });
   });
 });

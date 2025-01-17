@@ -1,30 +1,29 @@
+import {
+  changelogPresets,
+  createChangelog,
+  createChangelogList,
+} from "../factories/changelog.factory";
 import { assertResponse, request, setupAPITest } from "./setup";
 
 const { describe, test, expect, context } = setupAPITest();
 const { baseUrl } = context;
 
-// モックデータ
-const mockChangelogs = [
-  {
-    id: 1,
-    version: "1.0.0",
-    description: "初期リリース",
-    release_date: expect.any(String),
-  },
-  {
-    id: 2,
-    version: "1.1.0",
-    description: "PWA対応を追加",
-    release_date: expect.any(String),
-  },
-];
-
 describe("Changelogs API", () => {
   test("GET /api/changelogs should return changelogs list", async () => {
+    const expectedChangelogs = [
+      createChangelog({ ...changelogPresets.majorRelease, id: 1 }),
+      createChangelog({ ...changelogPresets.featureUpdate, id: 2 }),
+    ];
+
     const { response, data } = await request(`${baseUrl}/changelogs`);
 
     assertResponse.ok(response);
-    expect(data).toEqual(mockChangelogs);
+    expect(data).toMatchObject(
+      expectedChangelogs.map((changelog) => ({
+        ...changelog,
+        release_date: expect.any(String),
+      }))
+    );
   });
 
   test("Cache should work for changelogs", async () => {
@@ -43,5 +42,34 @@ describe("Changelogs API", () => {
 
     // キャッシュされたリクエストの方が高速であることを確認
     expect(cacheDuration).toBeLessThan(firstDuration);
+  });
+
+  test("should handle changelog data structure", async () => {
+    const { response, data } = await request(`${baseUrl}/changelogs`);
+
+    assertResponse.ok(response);
+    expect(data[0]).toMatchObject({
+      id: expect.any(Number),
+      version: expect.stringMatching(/^\d+\.\d+\.\d+$/),
+      description: expect.any(String),
+      release_date: expect.any(String),
+      is_major: expect.any(Boolean),
+    });
+  });
+
+  test("should handle multiple changelogs with different versions", async () => {
+    const { response, data } = await request(`${baseUrl}/changelogs`);
+
+    assertResponse.ok(response);
+    const versions = data.map((changelog) => changelog.version);
+    const uniqueVersions = new Set(versions);
+
+    // バージョンが重複していないことを確認
+    expect(uniqueVersions.size).toBe(versions.length);
+
+    // バージョンが正しい形式であることを確認
+    versions.forEach((version) => {
+      expect(version).toMatch(/^\d+\.\d+\.\d+$/);
+    });
   });
 });
