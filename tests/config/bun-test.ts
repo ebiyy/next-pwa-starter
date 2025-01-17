@@ -1,7 +1,13 @@
 /// <reference types="bun-types" />
 
-import { expect, test } from "bun:test";
-import { afterAll, beforeAll, describe } from "bun:test";
+import {
+  afterAll,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { createCacheKey } from "@/lib/test-utils";
@@ -71,16 +77,15 @@ export const releaseResource = (key: string): void => {
 };
 
 // テスト環境変数の読み込み
-const loadTestEnv = () => {
+const loadTestEnv = (): boolean => {
   if (process.env.NODE_ENV !== "test") {
     return false;
   }
 
-  let envVars: Record<string, string> = {};
   try {
     const envPath = resolve(process.cwd(), ".env.test");
     const envContent = readFileSync(envPath, "utf-8");
-    envVars = Object.fromEntries(
+    const envVars = Object.fromEntries(
       envContent
         .split("\n")
         .filter(Boolean)
@@ -88,13 +93,16 @@ const loadTestEnv = () => {
         .map((line) => line.split("=").map((part) => part.trim()))
         .filter((parts) => parts.length === 2)
     );
-  } catch {
-    console.warn("Warning: .env.test file not found");
-    return false;
-  }
 
-  Object.assign(process.env, envVars);
-  return true;
+    Object.assign(process.env, envVars);
+    return true;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error("Error loading .env.test:", error.message);
+      throw new Error(".env.test file is required for running tests");
+    }
+    throw error;
+  }
 };
 
 // スナップショット設定の管理
@@ -115,15 +123,19 @@ export const updateSnapshotConfig = (config: Partial<SnapshotConfig>) => {
 export const getSnapshotConfig = (): SnapshotConfig => ({ ...snapshotConfig });
 
 // テストセットアップのユーティリティ
-let isSetup = false;
+const setupState = new WeakMap<object, boolean>();
 
-export const setupTest = () => {
+export const setupTest = (context: object = {}) => {
+  if (setupState.get(context)) {
+    return;
+  }
+
   const setup = () => {
     // テスト前の共通セットアップ
     process.env.NEXT_PUBLIC_TEST_MODE = "true";
     loadTestEnv();
 
-    // シャーディング設定の適用
+    // シャーディング設定の適用（一度だけログ出力）
     const shardConfig = getShardConfig();
     if (shardConfig) {
       console.log(
@@ -145,20 +157,17 @@ export const setupTest = () => {
     });
   };
 
-  if (!isSetup) {
-    beforeAll(() => {
-      setup();
-      isSetup = true;
-    });
+  setup();
+  setupState.set(context, true);
 
-    afterAll(() => {
-      cleanup();
-      isSetup = false;
-    });
+  beforeAll(() => {
+    // beforeAllでは環境変数の再設定は行わない
+  });
 
-    // 即時実行も行う（テストのために）
-    setup();
-  }
+  afterAll(() => {
+    cleanup();
+    setupState.delete(context);
+  });
 };
 
 // パラメータのバリデーション

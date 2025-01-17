@@ -1,5 +1,22 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// テストポートの設定
+const PORT = process.env.TEST_PORT
+  ? Number.parseInt(process.env.TEST_PORT, 10)
+  : 3000;
+const BASE_URL =
+  process.env.PLAYWRIGHT_TEST_BASE_URL || `http://localhost:${PORT}`;
+
+// CIでの並列実行時のポート計算
+const getTestPort = () => {
+  if (process.env.CI && process.env.SHARD_ID) {
+    // シャード番号に基づいてポートをオフセット
+    const shardId = Number.parseInt(process.env.SHARD_ID, 10);
+    return PORT + shardId;
+  }
+  return PORT;
+};
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
@@ -11,7 +28,7 @@ export default defineConfig({
     ["junit", { outputFile: "tests/reports/junit/results.xml" }],
   ],
   use: {
-    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:3000",
+    baseURL: BASE_URL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -53,10 +70,11 @@ export default defineConfig({
   },
   // Webサーバーの設定
   webServer: {
-    command: "bun run dev",
-    url: "http://localhost:3000",
-    reuseExistingServer: !process.env.CI,
+    command: `PORT=${getTestPort()} bun run dev`,
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI && process.env.REUSE_SERVER === "true",
     stdout: "pipe",
     stderr: "pipe",
+    timeout: 60000, // 1分
   },
 });
