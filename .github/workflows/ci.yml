@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -18,41 +17,20 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
       - name: Install dependencies
         run: bun install
 
-      - name: Start Supabase
-        run: bun run db:start
+      - name: Run linter
+        run: bunx @biomejs/biome check .
 
-      - name: Generate types
-        run: bun run db:types
+      - name: Run tests
+        run: bun test
 
-      - name: Type check
-        run: bunx tsc --noEmit
-
-      - name: Lint
-        run: bun run lint
-
-      - name: Unit & Integration tests
-        run: bun run test
-
-      - name: Install Playwright
-        run: bunx playwright install --with-deps chromium
-
-      - name: E2E tests
+      - name: Run E2E tests
         run: bun run test:e2e
 
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
+  lighthouse:
     runs-on: ubuntu-latest
-    environment: production
-
     steps:
       - uses: actions/checkout@v4
 
@@ -67,6 +45,20 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          configPath: '.github/lighthouse/config.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  deploy:
+    needs: [test, lighthouse]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v25
         with:

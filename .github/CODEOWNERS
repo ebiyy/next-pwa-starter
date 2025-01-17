@@ -1,0 +1,14 @@
+# Default owner
+* @ebiyy
+
+# Infrastructure and config
+.github/ @ebiyy
+supabase/ @ebiyy
+*.json @ebiyy
+*.ts @ebiyy
+*.mjs @ebiyy
+
+# Application
+src/ @ebiyy
+public/ @ebiyy
+tests/ @ebiyy
