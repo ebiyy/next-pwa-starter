@@ -1,0 +1,152 @@
+name: コンポーネント
+description: 新しいUIコンポーネントの追加や既存コンポーネントの改善提案
+title: "[Component]: "
+labels: ["component", "ui"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        UIコンポーネントに関する提案について、詳細な情報を記入してください。
+        shadcn/uiの設計原則に従い、アクセシビリティとパフォーマンスを考慮した提案をお願いします。
+
+  - type: dropdown
+    id: component_type
+    attributes:
+      label: コンポーネントタイプ
+      description: 提案するコンポーネントの種類を選択してください
+      options:
+        - 新規コンポーネント
+        - 既存コンポーネントの改善
+        - コンポーネントの統合
+        - スタイルの改善
+    validations:
+      required: true
+
+  - type: input
+    id: component_name
+    attributes:
+      label: コンポーネント名
+      description: コンポーネントの名前（既存コンポーネントの場合は現在の名前）
+      placeholder: "例: Button, Card, Dialog"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: コンポーネントの目的と機能を説明してください
+      placeholder: |
+        例：
+        - コンポーネントの主な機能
+        - 解決する課題
+        - ユースケース
+    validations:
+      required: true
+
+  - type: textarea
+    id: design_spec
+    attributes:
+      label: デザイン仕様
+      description: コンポーネントのデザインに関する詳細を記述してください
+      value: |
+        ### スタイル
+        ```css
+        // 基本スタイル
+        .component {
+          /* スタイル例 */
+        }
+
+        // バリエーション
+        .component--variant {
+          /* バリエーションのスタイル */
+        }
+        ```
+
+        ### プロパティ
+        ```typescript
+        interface ComponentProps {
+          // プロパティの型定義
+        }
+        ```
+
+        ### アクセシビリティ
+        - ARIA属性
+        - キーボード操作
+        - スクリーンリーダー対応
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: 実装案
+      description: コンポーネントの実装に関する提案を記述してください
+      value: |
+        ### コンポーネント構造
+        ```typescript
+        // コンポーネントの基本構造
+        export function Component({ ...props }: ComponentProps) {
+          return (
+            // JSX
+          )
+        }
+        ```
+
+        ### テスト計画
+        ```typescript
+        describe('Component', () => {
+          test('基本的な動作', () => {
+            // テストケース
+          })
+
+          test('アクセシビリティ', () => {
+            // アクセシビリティテスト
+          })
+        })
+        ```
+
+  - type: textarea
+    id: usage_example
+    attributes:
+      label: 使用例
+      description: コンポーネントの使用例を記述してください
+      value: |
+        ```tsx
+        // 基本的な使用例
+        <Component />
+
+        // プロパティを使用した例
+        <Component variant="primary" />
+
+        // 他のコンポーネントとの組み合わせ例
+        <Card>
+          <Component />
+        </Card>
+        ```
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: 要件チェック
+      description: 以下の要件を満たしているか確認してください
+      options:
+        - label: shadcn/uiのデザインシステムに準拠している
+          required: true
+        - label: アクセシビリティガイドラインに準拠している
+          required: true
+        - label: レスポンシブデザインに対応している
+          required: true
+        - label: テーマシステムに対応している
+          required: true
+        - label: パフォーマンスを考慮している
+          required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 追加情報
+      description: その他、重要な情報や考慮点があれば記入してください
+      placeholder: |
+        - 特別な依存関係
+        - パフォーマンスへの影響
+        - ブラウザ互換性
+        - アニメーションの仕様

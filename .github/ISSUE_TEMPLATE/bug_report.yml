@@ -1,0 +1,94 @@
+name: バグレポート
+description: バグの報告や問題の指摘
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        バグの詳細な情報を提供してください。できるだけ具体的に記述することで、問題の特定と修正が容易になります。
+
+  - type: input
+    id: version
+    attributes:
+      label: バージョン
+      description: 問題が発生しているバージョン
+      placeholder: "例: v1.0.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: バグの説明
+      description: バグの内容を詳しく説明してください
+      placeholder: |
+        例：
+        - 何が起きているか
+        - 期待される動作
+        - 実際の動作
+        - 再現手順
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: 発生環境
+      description: バグが発生する環境を選択してください
+      multiple: true
+      options:
+        - 開発環境（localhost）
+        - ステージング環境
+        - 本番環境
+        - オフライン時
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browsers
+    attributes:
+      label: ブラウザ
+      description: 問題が発生するブラウザを選択してください
+      multiple: true
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: performance
+    attributes:
+      label: パフォーマンス情報
+      description: パフォーマンスに関する問題の場合、以下の情報を提供してください
+      value: |
+        ### Lighthouseスコア
+        - Performance: 
+        - Accessibility: 
+        - Best Practices: 
+        - SEO: 
+        - PWA: 
+
+        ### Web Vitals
+        - FCP (First Contentful Paint): 
+        - LCP (Largest Contentful Paint): 
+        - TTI (Time to Interactive): 
+        - TBT (Total Blocking Time): 
+        - CLS (Cumulative Layout Shift): 
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: エラーログ
+      description: 関連するエラーログやコンソール出力を提供してください
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 追加情報
+      description: その他、問題解決に役立つ情報があれば記入してください

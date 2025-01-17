@@ -1,0 +1,190 @@
+name: セキュリティ
+description: セキュリティに関する問題報告や改善提案
+title: "[Security]: "
+labels: ["security"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        セキュリティに関する問題や改善提案について、詳細な情報を記入してください。
+        機密情報は含めないようご注意ください。
+
+  - type: dropdown
+    id: security_type
+    attributes:
+      label: セキュリティタイプ
+      description: セキュリティ問題の種類を選択してください
+      multiple: true
+      options:
+        - 認証・認可
+        - API セキュリティ
+        - データ保護
+        - 環境変数管理
+        - CORS設定
+        - XSS対策
+        - CSRF対策
+        - レートリミット
+        - 監査ログ
+        - その他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 深刻度
+      description: 問題の深刻度を選択してください
+      options:
+        - 緊急（即時対応が必要）
+        - 重要（計画的な対応が必要）
+        - 中程度（通常の優先度で対応）
+        - 低（長期的な改善として検討）
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 問題の説明
+      description: セキュリティ上の問題や懸念事項を説明してください
+      placeholder: |
+        例：
+        - 脆弱性の内容
+        - 想定されるリスク
+        - 影響範囲
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_details
+    attributes:
+      label: 技術的な詳細
+      description: 問題の技術的な詳細を記述してください
+      value: |
+        ### 影響を受けるコンポーネント
+        - Supabase認証
+        - APIエンドポイント
+        - 環境変数
+        - etc.
+
+        ### 関連するコード
+        ```typescript
+        // 問題のある実装例（機密情報は含めないでください）
+        ```
+
+        ### セキュリティチェック
+        - [ ] 認証の検証
+        - [ ] 権限の検証
+        - [ ] 入力値の検証
+        - [ ] 出力のエスケープ
+        - [ ] セッション管理
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 解決案
+      description: 推奨される解決策を記述してください
+      value: |
+        ### 修正案
+        ```typescript
+        // 改善後のコード例
+        ```
+
+        ### セキュリティ強化策
+        1. 認証・認可
+           - [ ] Supabase RLSの適切な設定
+           - [ ] APIルートの保護
+           - [ ] セッション管理の改善
+
+        2. データ保護
+           - [ ] 機密データの暗号化
+           - [ ] アクセス制御の強化
+           - [ ] バックアップ戦略
+
+        3. 環境設定
+           - [ ] 環境変数の見直し
+           - [ ] CORS設定の最適化
+           - [ ] レートリミットの設定
+
+  - type: textarea
+    id: implementation_plan
+    attributes:
+      label: 実装計画
+      description: セキュリティ改善の実装計画を記述してください
+      value: |
+        ### 準備フェーズ
+        1. セキュリティ監査
+           - [ ] 現状の分析
+           - [ ] リスク評価
+           - [ ] 優先順位付け
+
+        ### 実装フェーズ
+        1. 認証システムの強化
+           ```typescript
+           // 実装例
+           ```
+
+        2. APIセキュリティの改善
+           ```typescript
+           // 実装例
+           ```
+
+        ### 検証フェーズ
+        1. セキュリティテスト
+           ```typescript
+           test('認証が適切に機能する', () => {
+             // テストコード
+           })
+           ```
+
+  - type: textarea
+    id: testing_verification
+    attributes:
+      label: テストと検証
+      description: セキュリティ改善の検証方法を記述してください
+      value: |
+        ### セキュリティテスト
+        ```typescript
+        // テストケース例
+        describe('セキュリティ機能', () => {
+          test('認証されていないユーザーはアクセスできない', () => {
+            // テストコード
+          })
+
+          test('適切な権限チェックが行われる', () => {
+            // テストコード
+          })
+        })
+        ```
+
+        ### 検証項目
+        - [ ] 脆弱性スキャン
+        - [ ] ペネトレーションテスト
+        - [ ] コードレビュー
+        - [ ] セキュリティ監査
+
+  - type: checkboxes
+    id: compliance
+    attributes:
+      label: コンプライアンス
+      description: 以下の要件を満たしているか確認してください
+      options:
+        - label: OWASPセキュリティガイドラインに準拠している
+          required: true
+        - label: データ保護規制に準拠している
+          required: true
+        - label: セキュリティベストプラクティスに従っている
+          required: true
+        - label: インシデント対応計画が整備されている
+          required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 追加情報
+      description: その他の重要な情報や考慮点があれば記入してください
+      placeholder: |
+        - セキュリティ監視の計画
+        - インシデント対応手順
+        - トレーニング要件
+        - ドキュメント更新の必要性

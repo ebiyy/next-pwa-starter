@@ -1,0 +1,164 @@
+name: タスク
+description: プロジェクトのタスクを作成する
+title: "[Task]: "
+labels: ["task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        タスクの詳細を記入してください。各セクションを丁寧に埋めることで、タスクの目的と実装手順が明確になります。
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      placeholder: "例: 新機能の実装"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: |
+        タスクの目的と概要を記述
+        - 何を実現したいのか
+        - なぜ必要なのか
+        - どのような効果が期待されるのか
+      placeholder: |
+        例：
+        - 新機能Xを実装して顧客満足度を向上
+        - パフォーマンスの問題を解決
+        - セキュリティの強化
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      description: 実装の各フェーズとステップを記述
+      value: |
+        ### 1. 基盤整備
+        - [ ] ステップ名
+          - コミット: `type: コミットメッセージ`
+          - 対象ファイル:
+            - ファイルパス
+          - テスト:
+            - `describe('機能名', () => {`
+            - `  test('期待される動作', () => {`
+            - `    // テストコード`
+            - `  });`
+            - `});`
+          - ロールバック:
+            - ロールバック手順
+
+        ### 2. 機能実装
+        - [ ] ステップ名
+          - コミット: `type: コミットメッセージ`
+          - 対象ファイル:
+            - ファイルパス
+          - テスト:
+            - `test('実装した機能が期待通りに動作する', () => {`
+            - `  // 機能のテストコード`
+            - `});`
+          - ロールバック:
+            - ロールバック手順
+
+        ### 3. テスト整備
+        - [ ] ステップ名
+          - コミット: `type: コミットメッセージ`
+          - 対象ファイル:
+            - テストファイルパス
+          - テスト:
+            - `test('テストケースが正しく機能を検証できる', () => {`
+            - `  // メタテストコード`
+            - `});`
+          - ロールバック:
+            - ロールバック手順
+    validations:
+      required: true
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      description: 実装時に従うべき規約
+      value: |
+        ### テスト規約
+        ```typescript
+        // テストファイル命名
+        - 機能テスト: {機能名}.test.ts
+        - 統合テスト: {機能名}.integration.test.ts
+        - E2Eテスト: {機能名}.e2e.test.ts
+
+        // テスト構造
+        describe('機能カテゴリ', () => {
+          describe('サブカテゴリ', () => {
+            test('期待される動作', () => {
+              // テストコード
+            });
+          });
+        });
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      description: メンテナンス項目と手順
+      value: |
+        ### テストの保守
+        ```typescript
+        // 定期的な確認項目
+        test('既存の機能が正常に動作している', () => {
+          // リグレッションテスト
+        });
+
+        test('パフォーマンスが基準を満たしている', () => {
+          // パフォーマンステスト
+        });
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      description: 問題発生時の対処方法
+      value: |
+        ### テストによる検証
+        ```typescript
+        test('ロールバックが正常に機能する', () => {
+          // ロールバック処理のテスト
+        });
+
+        test('データの整合性が保たれている', () => {
+          // 状態検証のテスト
+        });
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      description: 実装時の注意点や重要な考慮事項
+      value: |
+        ### テストの注意点
+        - テストは独立して実行可能であること
+        - モックやスタブは最小限に抑える
+        - テストデータは専用のファクトリを使用
+        - スナップショットテストは慎重に使用
+
+  - type: markdown
+    attributes:
+      value: |
+        ## コミットタイプ
+        - `feat`: 新機能
+        - `fix`: バグ修正
+        - `test`: テストの追加や修正
+        - `refactor`: バグ修正や機能追加ではないコードの変更
+        - `style`: コードの意味に影響を与えない変更
+        - `docs`: ドキュメントのみの変更
+        - `perf`: パフォーマンスを向上させるコードの変更
+        - `chore`: ビルドプロセスやツールの変更

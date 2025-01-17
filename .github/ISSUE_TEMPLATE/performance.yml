@@ -1,0 +1,171 @@
+name: パフォーマンス
+description: パフォーマンスの問題報告や改善提案
+title: "[Performance]: "
+labels: ["performance"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        パフォーマンスに関する問題や改善提案について、測定結果と共に具体的に記述してください。
+        プロジェクトの目標：
+        - Lighthouseスコア: 90以上
+        - First Contentful Paint: 1.5s以下
+        - Time to Interactive: 3s以下
+
+  - type: dropdown
+    id: performance_type
+    attributes:
+      label: パフォーマンスタイプ
+      description: パフォーマンスの種類を選択してください
+      multiple: true
+      options:
+        - ページロード時間
+        - First Contentful Paint (FCP)
+        - Largest Contentful Paint (LCP)
+        - Time to Interactive (TTI)
+        - Total Blocking Time (TBT)
+        - Cumulative Layout Shift (CLS)
+        - バンドルサイズ
+        - キャッシュ効率
+        - PWAパフォーマンス
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_metrics
+    attributes:
+      label: 現在の測定値
+      description: 現在のパフォーマンス測定結果を記入してください
+      value: |
+        ### Lighthouse スコア
+        - Performance: 
+        - PWA: 
+        - Best Practices: 
+
+        ### Core Web Vitals
+        - FCP: 
+        - LCP: 
+        - TTI: 
+        - TBT: 
+        - CLS: 
+
+        ### その他の指標
+        - バンドルサイズ: 
+        - メモリ使用量: 
+        - CPU使用率: 
+    validations:
+      required: true
+
+  - type: textarea
+    id: target_metrics
+    attributes:
+      label: 目標値
+      description: 改善後の目標値を記入してください
+      value: |
+        ### Lighthouse スコア
+        - Performance: 90以上
+        - PWA: 90以上
+        - Best Practices: 90以上
+
+        ### Core Web Vitals
+        - FCP: 1.5s以下
+        - LCP: 2.5s以下
+        - TTI: 3.0s以下
+        - TBT: 300ms以下
+        - CLS: 0.1以下
+
+        ### その他の指標
+        - バンドルサイズ: 
+        - メモリ使用量: 
+        - CPU使用率: 
+
+  - type: textarea
+    id: analysis
+    attributes:
+      label: 分析結果
+      description: パフォーマンス問題の分析結果を記述してください
+      placeholder: |
+        例：
+        - ボトルネックの特定
+        - 問題の原因
+        - 影響を受けている機能やコンポーネント
+
+  - type: textarea
+    id: improvement_plan
+    attributes:
+      label: 改善案
+      description: 具体的な改善案を記述してください
+      value: |
+        ### コード最適化
+        ```typescript
+        // 最適化前
+        // 改善が必要なコード例
+
+        // 最適化後
+        // 改善案のコード例
+        ```
+
+        ### バンドル最適化
+        - 使用していないコードの削除
+        - コード分割の導入
+        - 遅延ローディングの適用
+
+        ### キャッシュ戦略
+        - キャッシュポリシーの設定
+        - Service Workerの最適化
+        - ストレージの効率化
+
+  - type: textarea
+    id: implementation_steps
+    attributes:
+      label: 実装手順
+      description: 改善の実装手順を記述してください
+      value: |
+        1. 準備作業
+           - [ ] パフォーマンス計測の準備
+           - [ ] 開発環境の設定
+
+        2. 実装
+           - [ ] コードの最適化
+           - [ ] バンドルの最適化
+           - [ ] キャッシュ戦略の実装
+
+        3. 検証
+           - [ ] パフォーマンステストの実行
+           - [ ] 目標値との比較
+           - [ ] リグレッションテスト
+
+  - type: textarea
+    id: verification_plan
+    attributes:
+      label: 検証計画
+      description: パフォーマンス改善の検証方法を記述してください
+      value: |
+        ### テスト環境
+        ```typescript
+        // パフォーマンステストの設定
+        test('パフォーマンス要件を満たしている', async () => {
+          // テストコード
+        })
+        ```
+
+        ### 測定方法
+        - Lighthouseを使用した測定
+        - Web Vitalsの計測
+        - ユーザー体験の検証
+
+  - type: checkboxes
+    id: considerations
+    attributes:
+      label: 考慮事項
+      description: 以下の項目を考慮しているか確認してください
+      options:
+        - label: モバイル環境での動作を確認している
+          required: true
+        - label: オフライン動作を考慮している
+          required: true
+        - label: 異なるネットワーク環境での動作を確認している
+          required: true
+        - label: ブラウザの互換性を確認している
+          required: true

@@ -1,0 +1,107 @@
+name: 機能要望
+description: 新機能の提案や既存機能の改善要望
+title: "[Feature Request]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        新機能の提案や既存機能の改善要望について、できるだけ具体的に記述してください。
+        提案の背景や期待される効果を含めることで、より良い議論が可能になります。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 現状の課題
+      description: 解決したい問題や課題について説明してください
+      placeholder: |
+        例：
+        - 現在の機能では○○ができない
+        - ××の操作が煩雑で使いづらい
+        - △△の機能が不足している
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 提案内容
+      description: 具体的な解決策や新機能の提案を記述してください
+      placeholder: |
+        例：
+        - 新しい機能の概要
+        - 期待される動作
+        - 想定されるユースケース
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature_type
+    attributes:
+      label: 機能タイプ
+      description: 提案する機能のタイプを選択してください
+      multiple: true
+      options:
+        - UIコンポーネント
+        - PWA機能
+        - パフォーマンス最適化
+        - セキュリティ強化
+        - API機能
+        - テスト改善
+        - ドキュメント
+        - その他
+    validations:
+      required: true
+
+  - type: textarea
+    id: technical_details
+    attributes:
+      label: 技術的な詳細
+      description: 実装に関する技術的な提案や考慮点があれば記述してください
+      value: |
+        ### 想定される実装方法
+        ```typescript
+        // 実装のサンプルコードや疑似コード
+        ```
+
+        ### 技術的な考慮点
+        - パフォーマンスへの影響
+        - セキュリティ上の考慮
+        - 既存機能との整合性
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案
+      description: 他に検討した解決策があれば記述してください
+      placeholder: |
+        例：
+        - 別のアプローチ
+        - 既存機能の活用方法
+        - 他のツールやライブラリの利用
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: 期待される効果
+      description: この機能追加による具体的な効果や利点を記述してください
+      placeholder: |
+        例：
+        - ユーザビリティの向上
+        - パフォーマンスの改善
+        - 開発効率の向上
+
+  - type: checkboxes
+    id: requirements
+    attributes:
+      label: 要件チェック
+      description: 提案内容が以下の要件を満たしているか確認してください
+      options:
+        - label: プロジェクトのコンセプトに合致している
+          required: true
+        - label: パフォーマンス要件（Lighthouseスコア90以上）を考慮している
+          required: true
+        - label: アクセシビリティを考慮している
+          required: true
+        - label: セキュリティ要件を考慮している
+          required: true
