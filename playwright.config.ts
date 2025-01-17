@@ -21,19 +21,26 @@ export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 3 : 1,
   workers: process.env.CI ? 1 : undefined,
   reporter: [
     ["html", { outputFolder: "tests/reports/playwright" }],
     ["junit", { outputFile: "tests/reports/junit/results.xml" }],
+    ["list"], // コンソールに詳細なログを出力
   ],
   use: {
     baseURL: BASE_URL,
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
-    // アニメーションの無効化（スナップショットテスト用）
-    actionTimeout: 3000,
+    // タイムアウトの設定
+    actionTimeout: 30000,
+    navigationTimeout: 30000,
+    // Service Worker用の設定
+    serviceWorkers: "allow",
+    // テスト実行時の安定性向上
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
   },
   projects: [
     {

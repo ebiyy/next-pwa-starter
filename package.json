@@ -9,7 +9,7 @@
     "lint": "biome check .",
     "format": "biome format . --write",
     "icons": "bun scripts/generate-icons.ts",
-    "pretest": "bun tests/scripts/setup.ts",
+    "pretest": "bun run test:setup && bun run db:seed:dev",
     "test": "bun test tests/unit tests/integration",
     "test:watch": "bun test tests/unit tests/integration --watch",
     "test:ui": "bun test tests/unit tests/integration --ui",
@@ -20,6 +20,11 @@
     "test:coverage": "bun test tests/unit tests/integration --coverage",
     "test:setup": "bun tests/scripts/setup.ts",
     "test:cleanup": "bun tests/scripts/cleanup.ts",
+    "test:performance": "bun test tests/performance/cache-strategy.test.ts",
+    "test:performance:report": "bun run build && bun run test:performance:run",
+    "test:performance:run": "start-server-and-test start http://localhost:3000 'bun tests/scripts/run-performance-tests.ts'",
+    "test:lighthouse": "bun run build && bun tests/scripts/run-lighthouse.ts",
+    "test:all": "bun run test && bun run test:e2e && bun run test:lighthouse && bun run test:performance:report",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
@@ -28,23 +33,17 @@
     "env:dev": "cp supabase/config.development.toml supabase/config.toml",
     "env:staging": "cp supabase/config.staging.toml supabase/config.toml",
     "env:prod": "cp supabase/config.production.toml supabase/config.toml",
-    "db:seed:dev": "supabase db reset --seed-file supabase/seed.sql",
+    "db:seed:dev": "supabase db reset",
     "db:seed:staging": "psql $STAGING_DATABASE_URL -f supabase/seed.staging.sql",
     "deploy:staging": "bunx supabase link --project-ref $STAGING_PROJECT_ID && bunx supabase db push",
     "deploy:prod": "bunx supabase link --project-ref $PRODUCTION_PROJECT_ID && bunx supabase db push",
     "db:backup": "pg_dump $DATABASE_URL > backup.sql",
     "db:status": "supabase status",
     "db:logs": "supabase logs",
-    "prepare": "husky install",
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "bun run db:types",
-      "bunx tsc --noEmit",
-      "bun run lint",
-      "bun run format"
-    ]
+    "ds:init": "bun scripts/init-data-source.ts",
+    "ds:supabase": "NEXT_PUBLIC_DATA_SOURCE_PROVIDER=supabase bun run ds:init",
+    "ds:clear-cache": "bun scripts/clear-cache.ts",
+    "ds:validate": "bun scripts/validate-data-source.ts"
   },
   "dependencies": {
     "@hono/node-server": "^1.13.7",
@@ -74,18 +73,19 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@faker-js/faker": "^9.4.0",
+    "@lhci/cli": "^0.14.0",
     "@playwright/test": "^1.49.1",
     "@shadcn/ui": "^0.0.4",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.3",
     "bun-types": "^1.1.43",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.4.1",
     "postcss": "^8",
     "sharp": "^0.33.5",
+    "start-server-and-test": "^2.0.10",
     "supabase": "^2.2.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "undici": "^7.2.3"
   }
 }

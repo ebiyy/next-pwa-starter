@@ -12,6 +12,7 @@
 - React.use
 - React Server Component
 - bun:test
+- gh
 
 # Concept
 - Minimum Configuration
@@ -52,6 +53,15 @@
     - Implement E2E tests for critical paths
     - Include performance testing
 - Progressive enhancement of PWA features
+
+# CI/CD Monitoring
+- Use GitHub CLI (gh) for:
+    - Workflow run inspection: `gh run list --workflow <name>.yml`
+    - Detailed logs analysis: `gh run view <run-id> --log`
+    - Issue tracking: `gh issue list/view`
+    - PR management: `gh pr list/view`
+- Monitor workflow failures proactively
+- Analyze build and test logs locally before pushing
 
 # Performance
 - Maintain Lighthouse score above 90

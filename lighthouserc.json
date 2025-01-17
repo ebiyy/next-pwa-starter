@@ -1,8 +1,6 @@
 {
   "ci": {
     "collect": {
-      "startServerCommand": "bun run start",
-      "chromePath": "/root/.cache/puppeteer/chrome/linux-*/chrome-linux/chrome",
       "url": ["http://localhost:3000"],
       "numberOfRuns": 3,
       "settings": {
@@ -30,7 +28,7 @@
         "disableStorageReset": true,
         "disableFullPageScreenshot": true,
         "disableScreenshot": true,
-        "output": ["json", "html", "jsonSummary"],
+        "output": ["json", "html"],
         "onlyAudits": [
           "first-contentful-paint",
           "interactive",
@@ -52,7 +50,9 @@
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "temporary-public-storage",
+      "githubToken": "$LHCI_GITHUB_APP_TOKEN",
+      "githubStatusContextSuffix": "performance"
     }
   }
 }
