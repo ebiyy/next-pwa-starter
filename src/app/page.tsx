@@ -3,7 +3,22 @@ import { FeatureCard } from "@/components/feature-card";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-client";
+import { initializeDataSource } from "@/lib/data-source";
 import { Suspense, use } from "react";
+
+// DataSourceの初期化
+const initializeAPI = async () => {
+  await initializeDataSource({
+    provider: "supabase",
+    environment:
+      (process.env.NODE_ENV as "development" | "staging" | "production") ??
+      "development",
+    databaseUrl: process.env.SUPABASE_URL ?? "http://127.0.0.1:54321",
+    supabaseAnonKey:
+      process.env.SUPABASE_ANON_KEY ??
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+  });
+};
 
 function Features() {
   const features = use(apiClient.getFeatures());
@@ -21,7 +36,10 @@ function Changelogs() {
   return <ChangelogList changelogs={changelogs} />;
 }
 
-export default function Home() {
+export default async function Home() {
+  // DataSourceの初期化
+  await initializeAPI();
+
   return (
     <main className="relative min-h-screen">
       <div className="fixed top-4 right-4 z-50">

@@ -44,10 +44,10 @@ export interface DataSourceOptions {
   /**
    * 環境設定（development, staging, production）
    */
-  environment: "development" | "staging" | "production";
+  environment: "development" | "staging" | "production" | "test";
 
   /**
-   * データベース接続URL（Supabaseの場合）
+   * データベース接続URL（Supabase）
    */
   databaseUrl?: string;
 
@@ -67,7 +67,7 @@ export type DataSourceFactory = (
 /**
  * データソースプロバイダーの種類
  */
-export type DataSourceProvider = "mock" | "supabase";
+export type DataSourceProvider = "supabase";
 
 /**
  * データソース初期化オプション
@@ -89,13 +89,11 @@ export async function initializeDataSource(
 ): Promise<DataSource> {
   const { provider, ...dataSourceOptions } = options;
 
-  // プロバイダーに応じたファクトリー関数の動的インポート
-  const factory: DataSourceFactory = await import(
-    `./data-sources/${provider}.data-source`
-  ).then((module) => module.default);
-
-  // データソースのインスタンス化
-  const dataSource = await factory(dataSourceOptions);
+  // Supabaseデータソースの初期化
+  const { default: createSupabaseDataSource } = await import(
+    "./data-sources/supabase.data-source"
+  );
+  const dataSource = await createSupabaseDataSource(dataSourceOptions);
   globalDataSource = dataSource;
 
   return dataSource;

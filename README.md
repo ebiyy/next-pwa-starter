@@ -56,8 +56,23 @@
 
 ### バックエンド
 - Hono.jsによる高速なAPIルーティング
-- Supabaseによるデータ永続化
-- インメモリキャッシュによるパフォーマンス最適化
+- DataSourceインターフェースによる抽象化
+- 環境に応じた実装の自動切り替え
+- キャッシュ戦略の統合
+
+### データソース
+- インターフェースベースの設計
+  - 共通のDataSourceインターフェース
+  - Supabaseによる堅牢な実装
+  - ファクトリーパターンによる初期化
+- キャッシュ戦略
+  - DataSource層での一元管理
+  - 環境に応じた最適化
+  - パフォーマンス検証機能
+- テスト戦略
+  - Supabaseテストインスタンスの活用
+  - テストファクトリーによるデータ生成
+  - シードデータによる一貫性確保
 
 ## 必要要件
 
@@ -147,6 +162,10 @@ bun run test:ui     # UIモードでテストを実行
 bun run test:unit   # ユニットテストの実行
 bun run test:integration # 統合テストの実行
 bun run test:coverage    # カバレッジレポートの生成
+bun run test:performance # パフォーマンステストの実行
+bun run test:performance:report # パフォーマンスレポートの生成（キャッシュ効果の検証含む）
+bun run test:lighthouse # Lighthouse CIの実行
+bun run test:all       # すべてのテスト（ユニット、E2E、パフォーマンス）を実行
 
 # E2Eテスト
 bun run test:e2e    # E2Eテストの実行
@@ -170,6 +189,16 @@ bun run db:logs     # Supabaseのログ確認
 bun run env:dev     # 開発環境の設定
 bun run env:staging # ステージング環境の設定
 bun run env:prod    # 本番環境の設定
+
+# データソース管理
+bun run ds:init     # データソースの初期化
+bun run ds:supabase # Supabaseデータソースの使用
+bun run ds:clear-cache # キャッシュのクリア
+bun run ds:validate   # データソースの検証
+
+# テストデータ
+bun run test:setup   # テスト環境のセットアップ
+bun run db:seed:dev  # 開発環境のシードデータ投入
 
 # デプロイ
 bun run deploy:staging # ステージング環境へのデプロイ
@@ -204,6 +233,40 @@ bun run icons       # PWAアイコンの生成
 - **統合テスト**: APIエンドポイントやコンポーネント間の連携テスト
 - **APIテスト**: エンドポイントの動作とキャッシュ機能の検証
 - **E2Eテスト**: ユーザーフロー、PWA機能、レスポンシブデザインの検証
+- **パフォーマンステスト**:
+  - キャッシュ戦略の効果検証
+  - レスポンスタイムの計測
+  - 並列リクエスト時の挙動確認
+- **Lighthouse CI**:
+  - パフォーマンススコアの検証（90以上）
+  - PWA対応の確認
+  - アクセシビリティの検証
+  - SEO最適化の確認
+
+### キャッシュ戦略
+
+プロジェクトは以下の階層的なキャッシュ戦略を実装しています：
+
+#### DataSource層のキャッシュ
+- インメモリキャッシュによる高速なレスポンス
+- 環境に応じた最適化（開発/本番）
+- キャッシュの有効期限管理
+- 並列リクエスト時の効率化
+
+#### Service Worker層のキャッシュ
+- オフライン対応のためのキャッシュ
+- 静的アセットの効率的な配信
+- ネットワークファーストの戦略
+- APIレスポンスのキャッシュ
+
+#### パフォーマンス検証
+- キャッシュ効果の定量的な測定
+  - レスポンスタイムの改善（平均40%以上）
+  - 並列リクエスト時の効率（最大60%改善）
+- Lighthouse CIによる継続的な監視
+  - パフォーマンススコア90以上を維持
+  - First Contentful Paint: 1.5s以下
+  - Time to Interactive: 3.0s以下
 
 ### テストユーティリティ
 
@@ -250,6 +313,9 @@ const snapshot = createSnapshot(element, {
 │   ├── app/        # Next.js App Router
 │   ├── components/ # UIコンポーネント
 │   ├── lib/        # ユーティリティ関数
+│   │   ├── data-sources/  # データソース実装
+│   │   ├── mock-data/    # モックデータ
+│   │   └── seed-data/    # シードデータ
 │   └── types/      # 型定義
 ├── supabase/       # Supabase設定
 ├── tasks/          # タスク定義

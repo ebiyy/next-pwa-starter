@@ -1,5 +1,5 @@
 import type { Changelog, Feature, TechStack } from "@/types/schema";
-import { mockChangelogs, mockFeatures, mockTechStacks } from "./mock-data";
+import { getDataSource } from "./data-source";
 
 export interface ApiClient {
   getFeatures(): Promise<Feature[]>;
@@ -8,21 +8,26 @@ export interface ApiClient {
   getTechStacksByCategory(category: string): Promise<TechStack[]>;
 }
 
-class MockApiClient implements ApiClient {
+class DataSourceApiClient implements ApiClient {
   async getFeatures(): Promise<Feature[]> {
-    return mockFeatures;
+    const dataSource = getDataSource();
+    return dataSource.getFeatures();
   }
 
   async getChangelogs(): Promise<Changelog[]> {
-    return mockChangelogs;
+    const dataSource = getDataSource();
+    return dataSource.getChangelogs();
   }
 
   async getTechStacks(): Promise<TechStack[]> {
-    return mockTechStacks;
+    const dataSource = getDataSource();
+    return dataSource.getTechStacks();
   }
 
   async getTechStacksByCategory(category: string): Promise<TechStack[]> {
-    return mockTechStacks.filter((stack) => stack.category === category);
+    const dataSource = getDataSource();
+    const techStacks = await dataSource.getTechStacks();
+    return techStacks.filter((stack) => stack.category === category);
   }
 }
 
@@ -56,8 +61,10 @@ class HonoApiClient implements ApiClient {
   }
 }
 
-// 開発中はモッククライアントを使用
-export const apiClient: ApiClient = new MockApiClient();
+// 環境に応じてクライアントを選択
+const getApiClient = (): ApiClient => {
+  const isServer = typeof window === "undefined";
+  return isServer ? new DataSourceApiClient() : new HonoApiClient();
+};
 
-// 本番環境では実際のAPIクライアントを使用
-// export const apiClient: ApiClient = new HonoApiClient();
+export const apiClient: ApiClient = getApiClient();

@@ -1,15 +1,29 @@
-import { cache } from "@/lib/cache";
-import { changelogsData, featuresData, techStacksData } from "@/lib/mock-data";
-import type {
-  Changelog,
-  Feature,
-  TechStack,
-  TechStackCategory,
-} from "@/types/schema";
+import {
+  type InitializeDataSourceOptions,
+  getDataSource,
+  initializeDataSource,
+} from "@/lib/data-source";
+import type { TechStackCategory } from "@/types/schema";
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { createRoute } from "@hono/zod-openapi";
 import { handle } from "hono/vercel";
 import { z } from "zod";
+
+// DataSourceの初期化
+const initializeAPI = async () => {
+  const options: InitializeDataSourceOptions = {
+    provider: "supabase",
+    environment:
+      (process.env.NODE_ENV as "development" | "staging" | "production") ??
+      "development",
+    databaseUrl: process.env.SUPABASE_URL ?? "http://127.0.0.1:54321",
+    supabaseAnonKey:
+      process.env.SUPABASE_ANON_KEY ??
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0",
+  };
+
+  await initializeDataSource(options);
+};
 
 const app = new OpenAPIHono().basePath("/api");
 
@@ -74,12 +88,9 @@ const getFeaturesRoute = createRoute({
 });
 
 app.openapi(getFeaturesRoute, async (c) => {
-  const cached = await cache.get("features");
-  if (cached) {
-    return c.json(JSON.parse(cached));
-  }
-  await cache.set("features", JSON.stringify(featuresData), 60);
-  return c.json(featuresData);
+  const dataSource = getDataSource();
+  const features = await dataSource.getFeatures();
+  return c.json(features);
 });
 
 // Changelogs
@@ -99,12 +110,9 @@ const getChangelogsRoute = createRoute({
 });
 
 app.openapi(getChangelogsRoute, async (c) => {
-  const cached = await cache.get("changelogs");
-  if (cached) {
-    return c.json(JSON.parse(cached));
-  }
-  await cache.set("changelogs", JSON.stringify(changelogsData), 60);
-  return c.json(changelogsData);
+  const dataSource = getDataSource();
+  const changelogs = await dataSource.getChangelogs();
+  return c.json(changelogs);
 });
 
 // Tech stacks
@@ -124,12 +132,9 @@ const getTechStacksRoute = createRoute({
 });
 
 app.openapi(getTechStacksRoute, async (c) => {
-  const cached = await cache.get("tech_stacks");
-  if (cached) {
-    return c.json(JSON.parse(cached));
-  }
-  await cache.set("tech_stacks", JSON.stringify(techStacksData), 60);
-  return c.json(techStacksData);
+  const dataSource = getDataSource();
+  const techStacks = await dataSource.getTechStacks();
+  return c.json(techStacks);
 });
 
 // Tech stacks by category
@@ -162,19 +167,16 @@ const getTechStacksByCategoryRoute = createRoute({
 
 app.openapi(getTechStacksByCategoryRoute, async (c) => {
   const category = c.req.param("category") as TechStackCategory;
-  const cacheKey = `tech_stacks_${category}`;
-
-  const cached = await cache.get(cacheKey);
-  if (cached) {
-    return c.json(JSON.parse(cached));
-  }
-
-  const filteredStacks = techStacksData.filter(
-    (stack: TechStack) => stack.category === category
+  const dataSource = getDataSource();
+  const techStacks = await dataSource.getTechStacks();
+  const filteredStacks = techStacks.filter(
+    (stack) => stack.category === category
   );
-  await cache.set(cacheKey, JSON.stringify(filteredStacks), 60);
   return c.json(filteredStacks);
 });
+
+// DataSourceの初期化
+await initializeAPI();
 
 export const GET = handle(app);
 export const POST = handle(app);
