@@ -289,7 +289,10 @@ GitHub Actionsによる自動テスト：
 
 ```
 .
-├── public/          # 静的ファイル
+├── .github/         # GitHub関連の設定
+│   └── ISSUE_TEMPLATE/ # Issueテンプレート
+├── issues/         # ローカルIssue管理
+├── public/         # 静的ファイル
 ├── src/
 │   ├── app/        # Next.js App Router
 │   ├── components/ # UIコンポーネント
@@ -297,7 +300,7 @@ GitHub Actionsによる自動テスト：
 │   └── types/      # 型定義
 ├── supabase/       # Supabase設定
 ├── tasks/          # タスク定義
-│   └── review-clinerules.task  # .clinerules レビュータスク
+│   └── *.batch.task  # 定例タスク（review-clinerules等）
 ├── tests/          # テストファイル
 │   ├── api/        # APIテスト
 │   ├── e2e/        # E2Eテスト
@@ -306,6 +309,52 @@ GitHub Actionsによる自動テスト：
 │   └── config/     # テスト設定
 └── .clinerules     # プロジェクトのルールと方針
 ```
+
+## タスク管理
+
+このプロジェクトでは、以下の2つの形式でタスクを管理します：
+
+### 1. GitHub Issue
+
+開発上の問題は、GitHub Issueとして管理します：
+
+- `.github/ISSUE_TEMPLATE/task.yml`: 問題管理用のテンプレート
+  - 実装フェーズごとのテストケース
+  - コミットメッセージの規約
+  - ロールバック戦略
+  - メンテナンス方針
+
+### 2. Clineタスク
+
+Cline（AI）向けのタスクは2種類の形式で管理します：
+
+#### 一時タスク（*.temp.task）
+- 現在進行中のタスク
+- プロジェクトルートに配置
+- 完了後は履歴として保管
+
+#### 定例タスク（*.batch.task）
+- `tasks/review-clinerules.batch.task`: プロジェクトルールの定期レビュー
+  - スプリントごとの短期評価
+  - 四半期ごとの長期評価
+  - 実践から得られた知見の反映
+
+### タスク管理の特徴
+
+1. テストファーストアプローチ
+- 各実装フェーズでのテストケース定義
+- テストコードによる検証
+- 自動化されたテスト実行
+
+2. 変更管理
+- gitによるバージョン管理
+- コミットメッセージの規約
+- ロールバック手順の明確化
+
+3. 保守性
+- 構造化されたドキュメント
+- テストによる仕様の保証
+- レビュープロセスの定期実行
 
 ## プロジェクトガバナンス
 

@@ -1,0 +1,174 @@
+name: データソースとテスト環境の整備
+
+description: |
+  モックデータとSupabaseの実データを統一的に管理し、
+  環境ごとの適切なデータ管理とテスト環境の整備を行う
+
+implementation_phases:
+  1. 基盤整備:
+    steps:
+      - name: DataSourceインターフェースの定義
+        commit: "feat: DataSourceインターフェースを定義"
+        files:
+          - src/lib/data-source.ts
+        validation:
+          - TypeScriptの型チェックが通ること
+          - 既存のモックデータの構造と整合していること
+
+      - name: 環境変数の設定
+        commit: "chore: 環境変数テンプレートを追加"
+        files:
+          - .env.example
+        validation:
+          - 必要な環境変数が漏れなく定義されていること
+
+      - name: package.jsonスクリプトの追加
+        commit: "chore: データベース関連スクリプトを追加"
+        files:
+          - package.json
+        validation:
+          - 各スクリプトが正常に実行できること
+          - ローカル環境でのマイグレーションが動作すること
+
+  2. モックデータの移行:
+    steps:
+      - name: MockDataSourceの実装
+        commit: "feat: MockDataSourceクラスを実装"
+        files:
+          - src/lib/data-sources/mock.data-source.ts
+        validation:
+          - 既存のモックデータが正しく提供されること
+          - テストが正常に実行できること
+
+      - name: テストヘルパーの実装
+        commit: "feat: テストヘルパーを実装"
+        files:
+          - tests/helpers/setup-test-db.ts
+        validation:
+          - テスト環境でデータソースが正しく初期化されること
+          - リセット機能が正常に動作すること
+
+      - name: 既存テストの移行
+        commit: "refactor: テストをDataSource対応に移行"
+        files:
+          - tests/unit/**/*.test.ts
+          - tests/integration/**/*.test.ts
+        validation:
+          - 全てのテストが新しいDataSourceを使用していること
+          - テストカバレッジが維持されていること
+
+  3. Supabase統合:
+    steps:
+      - name: SupabaseDataSourceの実装
+        commit: "feat: SupabaseDataSourceクラスを実装"
+        files:
+          - src/lib/data-sources/supabase.data-source.ts
+        validation:
+          - ローカルのSupabaseに接続できること
+          - CRUD操作が正常に動作すること
+
+      - name: シードデータの整備
+        commit: "feat: 環境別シードデータを追加"
+        files:
+          - supabase/seed.development.sql
+          - supabase/seed.staging.sql
+          - supabase/seed.sql
+        validation:
+          - 各環境でシードデータが正しく適用されること
+          - データの整合性が保たれていること
+
+      - name: マイグレーション管理の設定
+        commit: "feat: マイグレーション管理を設定"
+        files:
+          - supabase/migrations/**/*.sql
+        validation:
+          - マイグレーションが正しく実行されること
+          - ロールバックが正常に動作すること
+
+  4. CI/CD整備:
+    steps:
+      - name: GitHub Actions更新
+        commit: "ci: データベース検証を追加"
+        files:
+          - .github/workflows/ci.yml
+        validation:
+          - CIでテストが正常に実行されること
+          - マイグレーション検証が機能すること
+
+      - name: デプロイフロー整備
+        commit: "ci: デプロイフローを更新"
+        files:
+          - .github/workflows/ci.yml
+        validation:
+          - ステージング環境へのデプロイが成功すること
+          - 本番環境へのデプロイが成功すること
+
+  5. 既存コード削除:
+    steps:
+      - name: 不要ファイルの削除
+        commit: "refactor: 旧モックデータ関連ファイルを削除"
+        files:
+          - src/lib/mock-data/**/*
+          - tests/factories/**/*
+          - tests/unit/mock-data.test.ts
+          - mock.task
+          - test.task
+        validation:
+          - アプリケーションが正常に動作すること
+          - テストが全て成功すること
+
+conventions:
+  naming:
+    files:
+      - データソース実装: {entity}.data-source.ts
+      - テスト: {entity}.test.ts
+    
+    functions:
+      - データ取得: get{Entity}
+      - データ作成: create{Entity}
+      - データリスト生成: create{Entity}List
+      - プリセット: {entity}Presets
+
+  structure:
+    data_source:
+      - エンティティごとに個別実装
+      - インターフェースベースの設計
+      - 型定義との一貫性を維持
+    
+    testing:
+      - 環境別のテスト設定
+      - テストヘルパーの活用
+      - データソースのモック化
+
+maintenance:
+  type_sync:
+    - Supabaseの型生成を自動化
+    - CIでの型チェック
+    - 型の不一致を早期発見
+  
+  testing:
+    - データソースの整合性テスト
+    - APIレスポンスの型チェック
+    - パフォーマンステスト
+
+  performance:
+    - テスト実行の並列化
+    - キャッシュ戦略の実装
+    - CI実行時間の最適化
+
+rollback_strategies:
+  data_source:
+    - 各フェーズでのコミットを分離
+    - 機能単位でのロールバックポイント設定
+    - 環境変数による切り替え機能の維持
+
+  database:
+    - マイグレーションのロールバック手順
+    - バックアップからのリストア手順
+    - シードデータの再適用手順
+
+notes: |
+  - 各フェーズで必ず動作確認を行い、問題があれば早期に発見する
+  - コミットは機能単位で行い、ロールバックが容易な状態を維持する
+  - 環境変数による切り替えを活用し、段階的な移行を可能にする
+  - テストカバレッジを維持し、品質を担保する
