@@ -10,7 +10,7 @@
 - 🔒 **Supabase** - 認証とデータベース
 - 🚀 **Turbopack** - 高速な開発環境
 - 📝 **Biome** - リントとフォーマット
-- 🧪 **Playwright** - E2Eテスト
+- 🧪 **Bun Test + Playwright** - ユニット、統合、E2Eテスト
 - 🔄 **Bun** - 高速なパッケージマネージャーとランタイム
 - 🌐 **Hono.js** - 軽量なAPIフレームワーク
 
@@ -32,6 +32,31 @@
 - [Bun](https://bun.sh) >= 1.0.0
 - [Node.js](https://nodejs.org) >= 18.17.0
 - [Docker](https://www.docker.com) (Supabase用)
+
+## セットアップ
+
+1. プロジェクトの作成
+
+## ポート設定
+
+### 開発環境
+- Next.js開発サーバー（next dev）: 3100
+- Next.js本番サーバー（next start）: 3200
+- Supabase Local Development: 54321
+- Supabase Studio: 54323
+
+### テスト環境
+- Playwright Test Server: 3101
+- API Test Server: 3101
+- E2E Test Server: 3102
+- Integration Test Server: 3103
+- Lighthouse Test Server: 3200（本番サーバーと共有）
+
+### 注意事項
+- 開発サーバーは3100を使用
+- 本番サーバーとLighthouseテストは3200を共有
+- テストサーバーは3101から順番に使用
+- Supabaseは標準ポート（54321）を使用
 
 ## セットアップ
 
@@ -92,8 +117,25 @@ bun run lint        # Biomeによるリント
 bun run format      # Biomeによるフォーマット
 
 # テスト
-bun run test        # Playwrightテストの実行
-bun run test:ui     # PlaywrightのUIモードでテスト実行
+bun run test        # すべてのテストを実行
+bun run test:watch  # ウォッチモードでテストを実行
+bun run test:ui     # UIモードでテストを実行
+bun run test:parallel # 並列実行でテストを実行
+
+# APIテスト
+bun run test:api     # APIテストの実行
+bun run test:api:watch # ウォッチモードでAPIテストを実行
+
+# E2Eテスト
+bun run test:e2e         # E2Eテストの実行
+bun run test:e2e:ui      # UIモードでE2Eテストを実行
+bun run test:e2e:init    # スナップショットの初期生成（初回のみ）
+bun run test:e2e:update  # スナップショットの更新（UI変更時）
+
+# その他のテスト
+bun run test:unit        # ユニットテストの実行
+bun run test:integration # 統合テストの実行
+bun run test:coverage    # カバレッジレポートの生成
 
 # Supabase
 bun run db:start    # ローカル環境の起動
@@ -121,19 +163,115 @@ bun run icons       # PWAアイコンの生成
 - `app/manifest.ts`: Web Manifestの設定
 - `public/sw.js`: Service Workerの実装（キャッシュ戦略、オフライン対応）
 
-## E2Eテスト
+## テスト
 
-PlaywrightによるE2Eテストを実装しており、以下の項目を自動的にテストします：
+このプロジェクトは包括的なテスト戦略を採用しています：
 
-### テスト項目
+### テストの種類
+
+#### ユニットテスト (Bun Test)
+- 個々のコンポーネントやユーティリティ関数のテスト
+- 高速な実行とホットリロード
+- カバレッジレポートの自動生成
+- キャッシュ戦略による実行速度の最適化
+
+#### 統合テスト (Bun Test)
+- APIエンドポイントのテスト
+- データベース操作のテスト
+- コンポーネント間の連携テスト
+- テスト環境の統一化による安定性向上
+
+#### APIテスト (Bun Test + Hono)
+- エンドポイントの動作検証
+- キャッシュ機能のテスト
+- レスポンスの型安全性
+- モックデータを使用した高速なテスト実行
+
+#### E2Eテスト (Playwright)
+- ユーザーフローの検証
 - PWAの基本機能（マニフェスト、Service Worker）
 - レスポンシブデザイン
 - ダークモード切り替え
 - コンポーネントの動作
+- ビジュアルリグレッションテスト（VRT）
+
+### テストユーティリティ
+
+#### セレクターの管理
+```typescript
+// テストID
+<button {...testId("submit-button")}>送信</button>
+const submitButton = page.locator(getByTestId("submit-button"));
+
+// ロールベース
+<button role="submit">送信</button>
+const submitButton = page.locator(byRole("submit"));
+```
+
+#### スナップショットの設定
+```typescript
+// 差分許容値の調整
+const snapshot = createSnapshot(element, {
+  threshold: 0.2,           // 許容する差分の割合
+  allowSizeDifference: true // サイズの差異を許容
+});
+```
+
+#### キャッシュの活用
+```typescript
+// テストデータのキャッシュ
+const data = await withCache("api-data", { id: 1 }, async () => {
+  return await fetchTestData();
+});
+```
+
+#### 開発サーバー待機
+```typescript
+// サーバー起動待ち
+await waitForServer({
+  message: "開発サーバーの起動を待機中...",
+  timeout: 30000,
+});
+```
+
+### テストの設定
+- `tests/config/bun-test.ts`: Bunテストの基本設定
+  - キャッシュ戦略の実装
+  - テスト環境の統一化
+  - スナップショット管理
+  - 並列実行の設定
+- `tests/config/playwright.ts`: Playwrightの設定
+- `tests/config/bunpack.config.ts`: テストランナーの設定
+- `tests/config/test/.env.test`: テスト環境変数
+
+### テストの最適化
+- 並列実行によるテスト実行時間の短縮
+- シャーディングによる効率的なテスト分散
+- キャッシュ戦略による重複実行の防止
+- 開発サーバー起動待ちの最適化
+
+### スナップショットの管理
+- `bun run test:update-snapshots`: すべてのスナップショットを一括更新
+  - ユニットテスト、統合テスト、E2Eテストのスナップショットを自動更新
+  - 差分許容値の自動調整
+  - 環境依存の差異を考慮
+
+### CI/CD
+GitHub Actionsによる自動テスト：
+- プッシュ時の自動テスト実行
+- PRのテスト状態チェック
+- テストカバレッジレポートの自動生成
+- テスト結果のアーティファクト保存
+- 並列実行による高速なテスト実行
 
 ### テストの注意点
+- test-idとロールベースのセレクターを適切に使い分け
 - アニメーションの完了を待つ際は、具体的なUI要素の表示を確認
 - モバイルデバイスではホバーイベントが機能しないため、代替の操作方法を実装
+- テストデータは`tests/fixtures`ディレクトリに配置
+- 環境変数は`.env.test`で管理
+- VRTテストを更新する際は、UIの変更が意図的なものか確認
+- APIテストではモックデータを活用し、テスト実行を高速化
 
 ## プロジェクト構成
 
@@ -146,8 +284,52 @@ PlaywrightによるE2Eテストを実装しており、以下の項目を自動�
 │   ├── lib/        # ユーティリティ関数
 │   └── types/      # 型定義
 ├── supabase/       # Supabase設定
-└── tests/          # E2Eテスト
+├── tasks/          # タスク定義
+│   └── review-clinerules.task  # .clinerules レビュータスク
+├── tests/          # テストファイル
+│   ├── api/        # APIテスト
+│   ├── e2e/        # E2Eテスト
+│   ├── integration/# 統合テスト
+│   ├── unit/       # ユニットテスト
+│   └── config/     # テスト設定
+└── .clinerules     # プロジェクトのルールと方針
 ```
+
+## プロジェクトガバナンス
+
+このプロジェクトは、`.clinerules` を通じて開発プラクティスとアーキテクチャの方針を管理しています。
+
+### .clinerules
+
+`.clinerules` は以下の要素を定義します：
+
+- **使用技術**: プロジェクトで採用する技術スタック
+- **設計原則**: Minimum Configurationを基本とした設計方針
+- **開発ルール**: ドキュメント、コーディング、テストに関する規約
+- **アーキテクチャ**: コンポーネント設計、API実装、型安全性の方針
+- **開発フロー**: コンポーネント開発、テスト戦略、PWA実装の手順
+- **品質基準**: パフォーマンス指標とセキュリティ要件
+
+### レビュープロセス
+
+`.clinerules` は定期的なレビューを通じて進化します：
+
+#### スプリントレビュー（短期）
+- 開発中に発見された課題の収集
+- 即座に対応可能な改善の実施
+- チームフィードバックの反映
+
+#### 四半期レビュー（長期）
+- 技術スタックの評価
+- アーキテクチャの見直し
+- 開発プロセスの最適化
+
+レビュープロセスは `tasks/review-clinerules.task` で定義され、以下の観点で評価されます：
+
+- 技術選択の意図と必要性
+- アーキテクチャの発展と実効性
+- 開発フローの効率性
+- ルールの実践的な価値
 
 ## 主要な依存関係
 

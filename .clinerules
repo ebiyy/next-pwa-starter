@@ -4,7 +4,7 @@
 - next.js@15
 - react@19
 - pwa
-- shadacon/ui
+- shadcn/ui
 - turbopack
 - supabase
 - hono.js
@@ -25,6 +25,40 @@
 - Register frequently used commands in package.json scripts for easy access and consistency
 - Utilize pre scripts (e.g., pretest, prebuild) in package.json to automate dependent task execution
 - Ensure proper task sequencing by leveraging npm/bun script hooks (pre/post)
+- Use English for all code and documentation
+- Use Japanese for all git commit messages
 
-# shadcn/ui
-- bunx @shadcn/ui@latest add xxx
+# Architecture
+- Components follow single responsibility principle
+- API clients use interface-based design
+- Enable easy switching between mock/implementation per environment
+- Prioritize type safety
+- Implement caching strategy for API responses
+- Follow interface-first design for all services
+- Use factory pattern for service instantiation
+
+# Development Flow
+- Component Development:
+    - Use shadcn/ui for base components
+    - Implement business logic in custom hooks
+    - Follow composition over inheritance
+- API Development:
+    - Design interfaces first
+    - Implement mock version for development
+    - Add cache layer when necessary
+- Testing Strategy:
+    - Write unit tests during development
+    - Add integration tests for API endpoints
+    - Implement E2E tests for critical paths
+    - Include performance testing
+- Progressive enhancement of PWA features
+
+# Performance
+- Maintain Lighthouse score above 90
+- First Contentful Paint under 1.5s
+- Time to Interactive under 3s
+
+# Security
+- Manage environment variables in .env.example
+- Implement proper authentication for API routes
+- Update dependencies regularly
