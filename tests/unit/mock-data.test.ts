@@ -1,7 +1,6 @@
-import { changelogsData } from "../../src/lib/mock-data/changelogs";
-import { featuresData } from "../../src/lib/mock-data/features";
-import { techStacksData } from "../../src/lib/mock-data/tech-stacks";
-import { describe, expect, setupTest, test } from "../config/bun-test";
+import { afterAll, beforeEach, describe, expect, test } from "bun:test";
+import type { DataSource } from "@/lib/data-source";
+import { setupTest } from "../config/bun-test";
 import {
   changelogPresets,
   createChangelog,
@@ -13,63 +12,132 @@ import {
   featurePresets,
   techStackPresets,
 } from "../factories";
+import {
+  cleanupTestDatabase,
+  createTestData,
+  resetTestDatabase,
+  setupTestDatabase,
+} from "../helpers/setup-test-db";
 
 setupTest();
 
-describe("モックデータ", () => {
-  test("技術スタックのデータが存在する", () => {
-    expect(techStacksData.length).toBeGreaterThan(0);
-    expect(techStacksData[0]).toHaveProperty("name");
-    expect(techStacksData[0]).toHaveProperty("category");
+let dataSource: DataSource;
+
+beforeEach(async () => {
+  dataSource = await setupTestDatabase();
+  await resetTestDatabase();
+});
+
+afterAll(async () => {
+  await cleanupTestDatabase();
+});
+
+describe("データソース", () => {
+  test("技術スタックのデータが取得できる", async () => {
+    // テストデータの作成
+    await createTestData({
+      techStacks: [createTechStack()],
+    });
+
+    const techStacks = await dataSource.getTechStacks();
+    expect(techStacks.length).toBeGreaterThan(0);
+    expect(techStacks[0]).toHaveProperty("name");
+    expect(techStacks[0]).toHaveProperty("category");
   });
 
-  test("機能のデータが存在する", () => {
-    expect(featuresData.length).toBeGreaterThan(0);
-    expect(featuresData[0]).toHaveProperty("title");
-    expect(featuresData[0]).toHaveProperty("description");
+  test("機能のデータが取得できる", async () => {
+    await createTestData({
+      features: [createFeature()],
+    });
+
+    const features = await dataSource.getFeatures();
+    expect(features.length).toBeGreaterThan(0);
+    expect(features[0]).toHaveProperty("title");
+    expect(features[0]).toHaveProperty("description");
   });
 
-  test("変更履歴のデータが存在する", () => {
-    expect(changelogsData.length).toBeGreaterThan(0);
-    expect(changelogsData[0]).toHaveProperty("version");
-    expect(changelogsData[0]).toHaveProperty("description");
+  test("変更履歴のデータが取得できる", async () => {
+    await createTestData({
+      changelogs: [createChangelog()],
+    });
+
+    const changelogs = await dataSource.getChangelogs();
+    expect(changelogs.length).toBeGreaterThan(0);
+    expect(changelogs[0]).toHaveProperty("version");
+    expect(changelogs[0]).toHaveProperty("description");
   });
 });
 
-describe("ファクトリー", () => {
-  test("技術スタックファクトリーが動作する", () => {
-    const techStack = createTechStack();
-    expect(techStack).toHaveProperty("name");
-    expect(techStack).toHaveProperty("category");
+describe("データ操作", () => {
+  test("技術スタックのCRUD操作", async () => {
+    // Create
+    const newTechStack = await dataSource.createTechStack(
+      createTechStack(techStackPresets.frontend)
+    );
+    expect(newTechStack.category).toBe("frontend");
 
-    const techStacks = createTechStackList(3);
-    expect(techStacks).toHaveLength(3);
+    // Read
+    const techStack = await dataSource.getTechStackById(newTechStack.id);
+    expect(techStack).toBeDefined();
+    expect(techStack?.name).toBe(newTechStack.name);
 
-    const presetTechStack = createTechStack(techStackPresets.frontend);
-    expect(presetTechStack.category).toBe("frontend");
+    // Update
+    const updatedTechStack = await dataSource.updateTechStack(newTechStack.id, {
+      description: "Updated description",
+    });
+    expect(updatedTechStack.description).toBe("Updated description");
+
+    // Delete
+    await dataSource.deleteTechStack(newTechStack.id);
+    const deletedTechStack = await dataSource.getTechStackById(newTechStack.id);
+    expect(deletedTechStack).toBeNull();
   });
 
-  test("機能ファクトリーが動作する", () => {
-    const feature = createFeature();
-    expect(feature).toHaveProperty("title");
-    expect(feature).toHaveProperty("description");
+  test("機能のCRUD操作", async () => {
+    // Create
+    const newFeature = await dataSource.createFeature(
+      createFeature(featurePresets.pwa)
+    );
+    expect(newFeature.icon_name).toBe("smartphone");
 
-    const features = createFeatureList(3);
-    expect(features).toHaveLength(3);
+    // Read
+    const feature = await dataSource.getFeatureById(newFeature.id);
+    expect(feature).toBeDefined();
+    expect(feature?.title).toBe(newFeature.title);
 
-    const presetFeature = createFeature(featurePresets.pwa);
-    expect(presetFeature.icon_name).toBe("smartphone");
+    // Update
+    const updatedFeature = await dataSource.updateFeature(newFeature.id, {
+      description: "Updated description",
+    });
+    expect(updatedFeature.description).toBe("Updated description");
+
+    // Delete
+    await dataSource.deleteFeature(newFeature.id);
+    const deletedFeature = await dataSource.getFeatureById(newFeature.id);
+    expect(deletedFeature).toBeNull();
   });
 
-  test("変更履歴ファクトリーが動作する", () => {
-    const changelog = createChangelog();
-    expect(changelog).toHaveProperty("version");
-    expect(changelog).toHaveProperty("description");
+  test("変更履歴のCRUD操作", async () => {
+    // Create
+    const newChangelog = await dataSource.createChangelog(
+      createChangelog(changelogPresets.majorRelease)
+    );
+    expect(newChangelog.is_major).toBe(true);
 
-    const changelogs = createChangelogList(3);
-    expect(changelogs).toHaveLength(3);
+    // Read
+    const changelog = await dataSource.getChangelogById(newChangelog.id);
+    expect(changelog).toBeDefined();
+    expect(changelog?.version).toBe(newChangelog.version);
 
-    const presetChangelog = createChangelog(changelogPresets.majorRelease);
-    expect(presetChangelog.is_major).toBe(true);
+    // Update
+    const updatedChangelog = await dataSource.updateChangelog(newChangelog.id, {
+      description: "Updated description",
+    });
+    expect(updatedChangelog.description).toBe("Updated description");
+
+    // Delete
+    await dataSource.deleteChangelog(newChangelog.id);
+    const deletedChangelog = await dataSource.getChangelogById(newChangelog.id);
+    expect(deletedChangelog).toBeNull();
   });
 });
