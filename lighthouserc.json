@@ -1,0 +1,58 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "bun run start",
+      "chromePath": "/root/.cache/puppeteer/chrome/linux-*/chrome-linux/chrome",
+      "url": ["http://localhost:3000"],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop",
+        "onlyCategories": ["performance"],
+        "skipAudits": [
+          "uses-http2",
+          "errors-in-console",
+          "service-worker",
+          "unused-javascript",
+          "unused-css-rules"
+        ],
+        "throttling": {
+          "cpuSlowdownMultiplier": 1,
+          "networkSlowdownMultiplier": 1
+        },
+        "maxWaitForLoad": 30000,
+        "formFactor": "desktop",
+        "screenEmulation": {
+          "width": 1280,
+          "height": 800,
+          "deviceScaleFactor": 1,
+          "mobile": false
+        },
+        "disableStorageReset": true,
+        "disableFullPageScreenshot": true,
+        "disableScreenshot": true,
+        "output": ["json", "html", "jsonSummary"],
+        "onlyAudits": [
+          "first-contentful-paint",
+          "interactive",
+          "speed-index",
+          "total-blocking-time",
+          "largest-contentful-paint",
+          "cumulative-layout-shift"
+        ]
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "first-contentful-paint": ["error", { "maxNumericValue": 1500 }],
+        "interactive": ["error", { "maxNumericValue": 3000 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 300 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
