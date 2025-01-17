@@ -23,7 +23,7 @@
     "test:performance": "bun test tests/performance/cache-strategy.test.ts",
     "test:performance:report": "bun run build && bun run test:performance:run",
     "test:performance:run": "start-server-and-test start http://localhost:3000 'bun tests/scripts/run-performance-tests.ts'",
-    "test:lighthouse": "bun tests/scripts/run-lighthouse.ts",
+    "test:lighthouse": "start-server-and-test start http://localhost:3000 'bun tests/scripts/run-lighthouse.ts'",
     "test:all": "bun run test && bun run test:e2e && bun run test:lighthouse && bun run test:performance:report",
     "db:start": "supabase start",
     "db:stop": "supabase stop",

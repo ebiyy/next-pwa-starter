@@ -1,6 +1,10 @@
 name: Lighthouse CI
+
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 permissions: write-all
 
@@ -46,6 +50,9 @@ jobs:
         run: bun run test:lighthouse
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
 
       - name: Save Lighthouse results
         uses: actions/upload-artifact@v3
