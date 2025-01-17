@@ -33,10 +33,6 @@
 - [Node.js](https://nodejs.org) >= 18.17.0
 - [Docker](https://www.docker.com) (Supabase用)
 
-## セットアップ
-
-1. プロジェクトの作成
-
 ## ポート設定
 
 ### 開発環境
@@ -81,9 +77,18 @@ cp .env.example .env.local
 ```
 
 `.env.local`の各値を設定:
-```
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```bash
+# 開発環境
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+NEXT_PUBLIC_SUPABASE_ANON_KEY=local-anon-key
+
+# ステージング環境
+# NEXT_PUBLIC_SUPABASE_URL=https://subkcevxjivxiiksnytj.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=staging-anon-key
+
+# 本番環境
+# NEXT_PUBLIC_SUPABASE_URL=https://xiwnydehiplcjgrcjjko.supabase.co
+# NEXT_PUBLIC_SUPABASE_ANON_KEY=production-anon-key
 ```
 
 4. 依存関係のインストール
@@ -120,22 +125,17 @@ bun run format      # Biomeによるフォーマット
 bun run test        # すべてのテストを実行
 bun run test:watch  # ウォッチモードでテストを実行
 bun run test:ui     # UIモードでテストを実行
-bun run test:parallel # 並列実行でテストを実行
-
-# APIテスト
-bun run test:api     # APIテストの実行
-bun run test:api:watch # ウォッチモードでAPIテストを実行
-
-# E2Eテスト
-bun run test:e2e         # E2Eテストの実行
-bun run test:e2e:ui      # UIモードでE2Eテストを実行
-bun run test:e2e:init    # スナップショットの初期生成（初回のみ）
-bun run test:e2e:update  # スナップショットの更新（UI変更時）
-
-# その他のテスト
-bun run test:unit        # ユニットテストの実行
+bun run test:unit   # ユニットテストの実行
 bun run test:integration # 統合テストの実行
 bun run test:coverage    # カバレッジレポートの生成
+
+# E2Eテスト
+bun run test:e2e    # E2Eテストの実行
+bun run test:e2e:ui # UIモードでE2Eテストを実行
+
+# テスト環境
+bun run test:setup   # テスト環境のセットアップ
+bun run test:cleanup # テスト環境のクリーンアップ
 
 # Supabase
 bun run db:start    # ローカル環境の起動
@@ -143,6 +143,18 @@ bun run db:stop     # ローカル環境の停止
 bun run db:reset    # データベースのリセット
 bun run db:types    # 型定義の生成
 bun run db:studio   # Studio UIを開く
+bun run db:seed:dev # 開発環境のシードデータ投入
+bun run db:status   # Supabaseの状態確認
+bun run db:logs     # Supabaseのログ確認
+
+# 環境設定
+bun run env:dev     # 開発環境の設定
+bun run env:staging # ステージング環境の設定
+bun run env:prod    # 本番環境の設定
+
+# デプロイ
+bun run deploy:staging # ステージング環境へのデプロイ
+bun run deploy:prod    # 本番環境へのデプロイ
 
 # その他
 bun run icons       # PWAアイコンの生成
