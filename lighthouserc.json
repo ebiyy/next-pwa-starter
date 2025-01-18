@@ -3,6 +3,7 @@
     "collect": {
       "url": ["http://localhost:3000"],
       "numberOfRuns": 3,
+      "outputDir": ".lighthouseci",
       "settings": {
         "preset": "desktop",
         "onlyCategories": [

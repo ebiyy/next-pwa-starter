@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 import { execSync, spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
 
 console.log("Starting Lighthouse CI...");
 
@@ -28,7 +29,7 @@ async function runLighthouse() {
     try {
       // Run Lighthouse CI collect
       console.log("Running Lighthouse CI collect...");
-      execSync("bunx @lhci/cli collect", {
+      execSync("bunx @lhci/cli collect --config=./lighthouserc.json", {
         stdio: "inherit",
         env: {
           ...process.env,
@@ -36,9 +37,20 @@ async function runLighthouse() {
         },
       });
 
+      // Debug: List and read result files
+      const files = await readdir(".lighthouseci");
+      console.log("Generated files:", files);
+
+      for (const file of files) {
+        if (file.endsWith(".json")) {
+          const content = await readFile(join(".lighthouseci", file), "utf8");
+          console.log(`Content of ${file}:`, content);
+        }
+      }
+
       // Run Lighthouse CI assert
       console.log("Running Lighthouse CI assert...");
-      execSync("bunx @lhci/cli assert", {
+      execSync("bunx @lhci/cli assert --config=./lighthouserc.json", {
         stdio: "inherit",
         env: {
           ...process.env,
@@ -48,7 +60,7 @@ async function runLighthouse() {
 
       // Run Lighthouse CI upload
       console.log("Running Lighthouse CI upload...");
-      execSync("bunx @lhci/cli upload", {
+      execSync("bunx @lhci/cli upload --config=./lighthouserc.json", {
         stdio: "inherit",
         env: {
           ...process.env,
