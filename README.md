@@ -6,9 +6,9 @@
 
 [![PWA](https://img.shields.io/badge/PWA-Ready-brightgreen?logo=pwa)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
-[![Bun](https://img.shields.io/badge/Bun-1.0-black?logo=bun)](https://bun.sh/)
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.0.0-blue?logo=react)](https://react.dev/)
+[![Bun](https://img.shields.io/badge/Bun-1.1.43-black?logo=bun)](https://bun.sh/)
 [![Supabase](https://img.shields.io/badge/Supabase-2.47.12-3ECF8E?logo=supabase)](https://supabase.com/)
 
 ## Lighthouse Score
