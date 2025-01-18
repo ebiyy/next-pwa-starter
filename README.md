@@ -4,8 +4,8 @@
 
 ## Lighthouse Score
 
-![Performance](https://img.shields.io/badge/Performance-100-brightgreen)
-![Accessibility](https://img.shields.io/badge/Accessibility-100-brightgreen)
+![Performance](https://img.shields.io/badge/performance-100-brightgreen)
+![Accessibility](https://img.shields.io/badge/accessibility-100-brightgreen)
 ![Best Practices](https://img.shields.io/badge/Best%20Practices-100-brightgreen)
 ![SEO](https://img.shields.io/badge/SEO-100-brightgreen)
 [![PWA](https://img.shields.io/badge/PWA-Ready-brightgreen?logo=pwa)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
