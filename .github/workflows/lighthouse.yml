@@ -24,16 +24,33 @@ jobs:
         with:
           bun-version: latest
 
+      - name: Cache Turbo
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Cache Next.js
+        uses: actions/cache@v3
+        with:
+          path: |
+            .next/cache
+            !.next/cache/images
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package.json', '**/bun.lockb', '**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
+
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.bun/install/cache
-            .next/cache
             /root/.cache/puppeteer
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/bun.lockb', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-deps-
 
       - name: Install dependencies
         run: bun install
