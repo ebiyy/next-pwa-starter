@@ -4,11 +4,11 @@
 
 ## Lighthouse Score
 
-[![Performance](https://img.shields.io/github/checks-status/ebiyy/next-pwa-starter/main?label=Lighthouse%20Performance&logo=lighthouse)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
-[![Accessibility](https://img.shields.io/github/checks-status/ebiyy/next-pwa-starter/main?label=Lighthouse%20Accessibility&logo=lighthouse)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
-[![Best Practices](https://img.shields.io/github/checks-status/ebiyy/next-pwa-starter/main?label=Lighthouse%20Best%20Practices&logo=lighthouse)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
-[![SEO](https://img.shields.io/github/checks-status/ebiyy/next-pwa-starter/main?label=Lighthouse%20SEO&logo=lighthouse)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
-[![PWA](https://img.shields.io/github/checks-status/ebiyy/next-pwa-starter/main?label=Lighthouse%20PWA&logo=lighthouse)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![Performance](https://img.shields.io/github/workflow/status/ebiyy/next-pwa-starter/Lighthouse%20CI?label=Performance&logo=lighthouse&style=for-the-badge)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![Accessibility](https://img.shields.io/github/workflow/status/ebiyy/next-pwa-starter/Lighthouse%20CI?label=Accessibility&logo=lighthouse&style=for-the-badge)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![Best Practices](https://img.shields.io/github/workflow/status/ebiyy/next-pwa-starter/Lighthouse%20CI?label=Best%20Practices&logo=lighthouse&style=for-the-badge)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![SEO](https://img.shields.io/github/workflow/status/ebiyy/next-pwa-starter/Lighthouse%20CI?label=SEO&logo=lighthouse&style=for-the-badge)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![PWA](https://img.shields.io/github/workflow/status/ebiyy/next-pwa-starter/Lighthouse%20CI?label=PWA&logo=pwa&style=for-the-badge)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
 
 ## Features
 
