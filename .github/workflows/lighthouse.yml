@@ -71,17 +71,15 @@ jobs:
             
             try {
               const resultsDir = '.lighthouseci';
-              const files = fs.readdirSync(resultsDir).filter(f => f.endsWith('.json'));
+              const files = fs.readdirSync(resultsDir)
+                .filter(f => f.endsWith('.json'))
+                .sort((a, b) => fs.statSync(path.join(resultsDir, b)).mtime.getTime() - fs.statSync(path.join(resultsDir, a)).mtime.getTime());
               
               if (files.length === 0) {
                 throw new Error('No Lighthouse results found');
               }
               
-              const results = files
-                .map(f => JSON.parse(fs.readFileSync(path.join(resultsDir, f))))
-                .sort((a, b) => b.fetchTime - a.fetchTime);
-              
-              const latestResult = results[0];
+              const latestResult = JSON.parse(fs.readFileSync(path.join(resultsDir, files[0])));
               const scores = {
                 performance: Math.round(latestResult.categories.performance.score * 100),
                 accessibility: Math.round(latestResult.categories.accessibility.score * 100),
@@ -158,29 +156,20 @@ jobs:
             let errorDetails = 'No detailed results available';
             
             try {
-              const files = fs.readdirSync('.lighthouseci').filter(f => f.endsWith('.json'));
+              const files = fs.readdirSync('.lighthouseci')
+                .filter(f => f.endsWith('.json'))
+                .sort((a, b) => fs.statSync(path.join('.lighthouseci', b)).mtime.getTime() - fs.statSync(path.join('.lighthouseci', a)).mtime.getTime());
+              
               if (files.length > 0) {
-                const results = files.map(f => JSON.parse(fs.readFileSync(`.lighthouseci/${f}`)))
-                  .filter(r => r.categories?.performance?.score < 0.9);
-                
-                if (results.length > 0) {
-                  errorDetails = results.map(r => {
-                    const score = (r.categories.performance.score * 100).toFixed(1);
-                    const fcp = (r.audits['first-contentful-paint'].numericValue / 1000).toFixed(2);
-                    const tti = (r.audits.interactive.numericValue / 1000).toFixed(2);
-                    const tbt = r.audits['total-blocking-time'].numericValue.toFixed(0);
-                    const cls = r.audits['cumulative-layout-shift'].numericValue.toFixed(3);
-                    const lcp = (r.audits['largest-contentful-paint'].numericValue / 1000).toFixed(2);
-                    
-                    return [
-                      `Performance Score: ${score}%`,
-                      `First Contentful Paint: ${fcp}s`,
-                      `Time to Interactive: ${tti}s`,
-                      `Total Blocking Time: ${tbt}ms`,
-                      `Cumulative Layout Shift: ${cls}`,
-                      `Largest Contentful Paint: ${lcp}s`
-                    ].join('\n');
-                  }).join('\n\n');
+                const latestResult = JSON.parse(fs.readFileSync(path.join('.lighthouseci', files[0])));
+                if (latestResult.categories?.performance?.score < 0.9) {
+                  const score = (latestResult.categories.performance.score * 100).toFixed(1);
+                  errorDetails = [
+                    `Performance Score: ${score}%`,
+                    `First Contentful Paint: ${(latestResult.audits['first-contentful-paint'].numericValue / 1000).toFixed(2)}s`,
+                    `Time to Interactive: ${(latestResult.audits.interactive.numericValue / 1000).toFixed(2)}s`,
+                    `Largest Contentful Paint: ${(latestResult.audits['largest-contentful-paint'].numericValue / 1000).toFixed(2)}s`
+                  ].join('\n');
                 }
               }
             } catch (e) {
