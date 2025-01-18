@@ -2,13 +2,20 @@
 
 最小限の設定でPWA対応したNext.jsスターターテンプレート
 
+## Status
+
+[![PWA](https://img.shields.io/badge/PWA-Ready-brightgreen?logo=pwa)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
+[![Bun](https://img.shields.io/badge/Bun-1.0-black?logo=bun)](https://bun.sh/)
+
 ## Lighthouse Score
 
 ![Performance](https://img.shields.io/badge/performance-100-brightgreen)
 ![Accessibility](https://img.shields.io/badge/accessibility-100-brightgreen)
 ![Best Practices](https://img.shields.io/badge/Best%20Practices-100-brightgreen)
 ![SEO](https://img.shields.io/badge/SEO-100-brightgreen)
-[![PWA](https://img.shields.io/badge/PWA-Ready-brightgreen?logo=pwa)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
 
 ## アーキテクチャ
 
