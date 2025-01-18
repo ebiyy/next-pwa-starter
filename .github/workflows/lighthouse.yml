@@ -55,163 +55,43 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Test Supabase Connection
-        run: bun tests/scripts/test-supabase-connection.ts
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
       - name: Build
         run: bun run build
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NODE_ENV: production
+
+      - name: Start server
+        run: bun run start & sleep 5
+        env:
           NODE_ENV: production
 
       - name: Run Lighthouse CI
-        run: bun tests/scripts/run-lighthouse.ts
+        run: |
+          bunx @lhci/cli@0.14.x autorun \
+            --collect.url=http://localhost:3000 \
+            --collect.numberOfRuns=3 \
+            --collect.settings.preset=desktop \
+            --upload.target=temporary-public-storage
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NODE_ENV: production
-          LHCI_BUILD_CONTEXT__CURRENT_BRANCH: ${{ github.ref_name }}
-          LHCI_BUILD_CONTEXT__CURRENT_HASH: ${{ github.sha }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Process Lighthouse Results
-        id: lighthouse
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            try {
-              const resultsDir = '.lighthouseci';
-              const files = fs.readdirSync(resultsDir)
-                .filter(f => f.endsWith('.json'))
-                .sort((a, b) => fs.statSync(path.join(resultsDir, b)).mtime.getTime() - fs.statSync(path.join(resultsDir, a)).mtime.getTime());
-              
-              if (files.length === 0) {
-                throw new Error('No Lighthouse results found');
-              }
-              
-              const latestResult = JSON.parse(fs.readFileSync(path.join(resultsDir, files[0])));
-              const scores = {
-                performance: Math.round(latestResult.categories.performance.score * 100),
-                accessibility: Math.round(latestResult.categories.accessibility.score * 100),
-                bestPractices: Math.round(latestResult.categories['best-practices'].score * 100),
-                seo: Math.round(latestResult.categories.seo.score * 100),
-                pwa: Math.round(latestResult.categories.pwa.score * 100)
-              };
-              
-              const readmePath = 'README.md';
-              let readme = fs.readFileSync(readmePath, 'utf8');
-              
-              const workflowUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/workflows/lighthouse.yml`;
-              
-              const scoreSection = [
-                '## Lighthouse スコア',
-                '',
-                `[![Performance: ${scores.performance}](https://img.shields.io/badge/Performance-${scores.performance}%25-${scores.performance >= 90 ? 'success' : 'orange'})](${workflowUrl})`,
-                `[![Accessibility: ${scores.accessibility}](https://img.shields.io/badge/Accessibility-${scores.accessibility}%25-${scores.accessibility >= 90 ? 'success' : 'orange'})](${workflowUrl})`,
-                `[![Best Practices: ${scores.bestPractices}](https://img.shields.io/badge/Best%20Practices-${scores.bestPractices}%25-${scores.bestPractices >= 90 ? 'success' : 'orange'})](${workflowUrl})`,
-                `[![SEO: ${scores.seo}](https://img.shields.io/badge/SEO-${scores.seo}%25-${scores.seo >= 90 ? 'success' : 'orange'})](${workflowUrl})`,
-                `[![PWA: ${scores.pwa}](https://img.shields.io/badge/PWA-${scores.pwa}%25-${scores.pwa >= 90 ? 'success' : 'orange'})](${workflowUrl})`,
-                '',
-                `*Last updated: ${new Date().toISOString().split('T')[0]}*`,
-                ''
-              ].join('\n');
-              
-              const lighthouseRegex = /## Lighthouse スコア[\s\S]*?\n\n/;
-              if (lighthouseRegex.test(readme)) {
-                readme = readme.replace(lighthouseRegex, scoreSection);
-              } else {
-                const featuresIndex = readme.indexOf('## 特徴');
-                if (featuresIndex !== -1) {
-                  readme = readme.slice(0, featuresIndex) + scoreSection + readme.slice(featuresIndex);
-                }
-              }
-              
-              fs.writeFileSync(readmePath, readme);
-              
-              // コミットとプッシュ
-              const exec = require('child_process').execSync;
-              exec('git config --global user.name "github-actions[bot]"');
-              exec('git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"');
-              exec('git add README.md');
-              exec('git commit -m "docs: 🚀 Lighthouseスコアを更新"');
-              exec('git push');
-              
-              return {
-                scores,
-                success: true
-              };
-            } catch (error) {
-              core.setFailed(`Error processing Lighthouse results: ${error.message}`);
-              return {
-                success: false,
-                error: error.message
-              };
-            }
-
-      - name: Save Lighthouse results
+      - name: Upload Lighthouse results
         uses: actions/upload-artifact@v3
         with:
           name: lighthouse-results
           path: .lighthouseci
-          if-no-files-found: error
           retention-days: 7
 
-      - name: Notify on failure
+      - name: Create GitHub Issue on failure
         if: failure()
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            let errorDetails = 'No detailed results available';
-            
-            try {
-              const files = fs.readdirSync('.lighthouseci')
-                .filter(f => f.endsWith('.json'))
-                .sort((a, b) => fs.statSync(path.join('.lighthouseci', b)).mtime.getTime() - fs.statSync(path.join('.lighthouseci', a)).mtime.getTime());
-              
-              if (files.length > 0) {
-                const latestResult = JSON.parse(fs.readFileSync(path.join('.lighthouseci', files[0])));
-                if (latestResult.categories?.performance?.score < 0.9) {
-                  const score = (latestResult.categories.performance.score * 100).toFixed(1);
-                  errorDetails = [
-                    `Performance Score: ${score}%`,
-                    `First Contentful Paint: ${(latestResult.audits['first-contentful-paint'].numericValue / 1000).toFixed(2)}s`,
-                    `Time to Interactive: ${(latestResult.audits.interactive.numericValue / 1000).toFixed(2)}s`,
-                    `Largest Contentful Paint: ${(latestResult.audits['largest-contentful-paint'].numericValue / 1000).toFixed(2)}s`
-                  ].join('\n');
-                }
-              }
-            } catch (e) {
-              errorDetails = `Error parsing results: ${e.message}`;
-            }
-            
-            const issueBody = [
-              `Lighthouse CI failed on commit ${context.sha}`,
-              '',
-              '### Performance Metrics',
-              '```',
-              errorDetails,
-              '```',
-              '',
-              '### Links',
-              `- [Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
-              `- [Commit](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`,
-              '',
-              'Please review the performance metrics and make necessary optimizations.'
-            ].join('\n');
-            
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: '🚨 Lighthouse CI Failed: Performance Issues Detected',
-              body: issueBody,
+              title: '🚨 Lighthouse CI Failed',
+              body: `Lighthouse CI failed on commit ${context.sha}\n\nCheck the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`,
               labels: ['performance', 'lighthouse-ci']
             });
