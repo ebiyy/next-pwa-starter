@@ -10,9 +10,7 @@
       }
     },
     "upload": {
-      "target": "lhci",
-      "serverBaseUrl": "https://lighthouse-ci.appspot.com/",
-      "token": "$LHCI_GITHUB_TOKEN"
+      "target": "temporary-public-storage"
     },
     "assert": {
       "assertions": {

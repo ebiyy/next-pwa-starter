@@ -78,7 +78,9 @@ jobs:
         env:
           LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bunx @lhci/cli@0.14.x autorun
+          bunx @lhci/cli@0.14.x autorun \
+            --upload.target=temporary-public-storage \
+            --upload.githubStatusContextSuffix=":lighthouse"
 
       - name: Upload artifacts
         if: always()
