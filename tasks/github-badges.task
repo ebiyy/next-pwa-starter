@@ -1,0 +1,124 @@
+name: GitHubバッジの実装
+description: プロジェクトのREADMEにステータスバッジを追加する
+title: "[Task]: GitHubバッジの実装"
+labels: ["task", "documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        プロジェクトの品質と特徴を視覚的に示すGitHubバッジを実装します。
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: GitHubバッジの実装
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: |
+        - プロジェクトの主要な特徴と品質指標をバッジとして表示
+        - 技術スタックの可視化
+        - 品質指標の透明性確保
+      value: |
+        ### 目的
+        - プロジェクトの特徴と品質を一目で把握可能にする
+        - 継続的なモニタリングと品質維持の動機付け
+        - プロジェクトの信頼性向上
+
+        ### 期待される効果
+        - プロジェクトの透明性向上
+        - 品質指標の可視化による信頼性向上
+        - メンテナンス状況の明確化
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      description: バッジ実装の各フェーズとステップ
+      value: |
+        ### 1. 基盤整備
+        - [ ] バッジ生成の自動化設定
+          - コミット: `chore: バッジ生成ワークフローの設定`
+          - 対象ファイル:
+            - .github/workflows/badges.yml
+          - テスト:
+            - GitHub Actionsの実行確認
+          - ロールバック:
+            - ワークフローファイルの削除
+
+        ### 2. バッジの実装
+        - [ ] 技術スタックバッジ
+          - コミット: `docs: 技術スタックバッジの追加`
+          - バッジ一覧:
+            - ![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black)
+            - ![Bun](https://img.shields.io/badge/Bun-latest-black)
+            - ![React](https://img.shields.io/badge/React-19-blue)
+            - ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)
+            - ![Supabase](https://img.shields.io/badge/Supabase-2.47.12-3ECF8E)
+
+        - [ ] 品質指標バッジ
+          - コミット: `docs: 品質指標バッジの追加`
+          - バッジ一覧:
+            - ![Lighthouse Performance](https://img.shields.io/badge/Lighthouse-Performance%20100-success)
+            - ![Lighthouse Accessibility](https://img.shields.io/badge/Lighthouse-Accessibility%20100-success)
+            - ![Lighthouse Best Practices](https://img.shields.io/badge/Lighthouse-Best%20Practices%20100-success)
+            - ![Lighthouse SEO](https://img.shields.io/badge/Lighthouse-SEO%20100-success)
+            - ![Lighthouse PWA](https://img.shields.io/badge/Lighthouse-PWA%20100-success)
+
+        - [ ] ステータスバッジ
+          - コミット: `docs: ステータスバッジの追加`
+          - バッジ一覧:
+            - ![CI](https://github.com/ebiyy/next-pwa-starter/workflows/CI/badge.svg)
+            - ![Test Coverage](https://img.shields.io/codecov/c/github/ebiyy/next-pwa-starter)
+            - ![License](https://img.shields.io/github/license/ebiyy/next-pwa-starter)
+### 3. 自動更新の設定
+- [ ] Lighthouseスコアの自動更新
+  - コミット: `chore: Lighthouseスコア自動更新の設定`
+  - 対象ファイル:
+    - scripts/lighthouse/generate-badges.ts
+  - テスト:
+    - 自動更新の動作確認 ✅
+  - ロールバック:
+    - 設定ファイルの削除
+            - 設定ファイルの削除
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      description: バッジ実装時の規約
+      value: |
+        ### バッジ規約
+        - バッジは shields.io を使用
+        - カラースキームは公式カラーを使用
+        - バッジの順序は重要度順
+        - リンクは関連ドキュメントに接続
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      description: バッジの保守項目
+      value: |
+        ### バッジの保守
+        - Lighthouseスコアの定期的な更新
+        - 依存関係バージョンの更新確認
+        - CIステータスの監視
+        - カバレッジ率の維持
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      description: バッジ実装時の注意点
+      value: |
+        ### 注意点
+        - バッジは最小限に抑え、重要な指標のみ表示
+        - 自動更新の仕組みを確実に実装
+        - バッジのリンク切れに注意
+        - パフォーマンススコアは実環境の値を使用
