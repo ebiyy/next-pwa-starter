@@ -7,11 +7,10 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
   checks: write
-  pull-requests: write
-  issues: write
   statuses: write
+  pull-requests: write
 
 jobs:
   lighthouse:
@@ -76,17 +75,13 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
       - name: Run Lighthouse CI
-        run: |
-          bunx @lhci/cli@0.14.x autorun \
-            --collect.url=http://localhost:3000 \
-            --collect.numberOfRuns=3 \
-            --collect.settings.preset=desktop \
-            --upload.target=temporary-public-storage
+        run: bunx @lhci/cli@0.14.x autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Lighthouse results
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
+        if: always()
         with:
           name: lighthouse-results
           path: .lighthouseci
