@@ -2,10 +2,14 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
+      "startServerCommand": "bun run start",
+      "url": ["http://localhost:3000"],
       "settings": {
-        "preset": "desktop"
+        "preset": "desktop",
+        "chromeFlags": ["--no-sandbox"]
       }
     },
+    "staticDistDir": ".next",
     "assert": {
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.9 }],
