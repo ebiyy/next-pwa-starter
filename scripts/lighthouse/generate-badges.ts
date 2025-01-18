@@ -55,7 +55,7 @@ const generateBadges = async () => {
               ? "yellow"
               : "red";
 
-      const badgeUrl = `https://img.shields.io/badge/${category}-${score}%25-${color}`;
+      const badgeUrl = `https://img.shields.io/badge/${category}-${score}-${color}`;
       const badgeInfo: BadgeInfo = { url: badgeUrl, score };
 
       // バッジ情報をJSONとして保存
