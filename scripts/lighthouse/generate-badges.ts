@@ -2,15 +2,6 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-interface LighthouseScore {
-  categories: {
-    performance: { score: number };
-    accessibility: { score: number };
-    "best-practices": { score: number };
-    seo: { score: number };
-  };
-}
-
 interface BadgeInfo {
   url: string;
   score: number;
@@ -29,15 +20,34 @@ const generateBadges = async () => {
       throw new Error("No Lighthouse report found");
     }
     const lhrPath = join(lighthouseDir, lhrFile);
-    const lhr = JSON.parse(readFileSync(lhrPath, "utf8")) as LighthouseScore;
+    const lhr = JSON.parse(readFileSync(lhrPath, "utf8"));
+    console.log("Lighthouse report structure:", JSON.stringify(lhr, null, 2));
 
-    // スコアの抽出
-    const scores = {
-      performance: Math.round(lhr.categories.performance.score * 100),
-      accessibility: Math.round(lhr.categories.accessibility.score * 100),
-      bestPractices: Math.round(lhr.categories["best-practices"].score * 100),
-      seo: Math.round(lhr.categories.seo.score * 100),
-    };
+    // スコアの抽出（エラーハンドリングを追加）
+    const scores: Record<string, number> = {};
+
+    if (lhr.categories) {
+      if (lhr.categories.performance?.score) {
+        scores.performance = Math.round(lhr.categories.performance.score * 100);
+      }
+      if (lhr.categories.accessibility?.score) {
+        scores.accessibility = Math.round(
+          lhr.categories.accessibility.score * 100
+        );
+      }
+      if (lhr.categories["best-practices"]?.score) {
+        scores.bestPractices = Math.round(
+          lhr.categories["best-practices"].score * 100
+        );
+      }
+      if (lhr.categories.seo?.score) {
+        scores.seo = Math.round(lhr.categories.seo.score * 100);
+      }
+    }
+
+    if (Object.keys(scores).length === 0) {
+      throw new Error("No valid scores found in Lighthouse report");
+    }
 
     // バッジ保存ディレクトリの作成
     const badgesDir = join(process.cwd(), ".github", "badges");
