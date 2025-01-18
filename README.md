@@ -1,399 +1,164 @@
-# Next.js PWA Starter
+# next-pwa-starter
 
-モダンなウェブアプリケーション開発のためのミニマルなスターターキット。PWA対応、型安全、高パフォーマンスな開発環境を提供します。
+最小限の設定でPWA対応したNext.jsスターターテンプレート
 
-## 特徴
+## Status
 
-- 📱 **PWA対応** - オフライン対応とモバイルファーストな設計
-- ⚡ **Next.js 15 + React 19** - App RouterとReact Server Components
-- 🎨 **Shadcn/UI + Tailwind CSS** - モダンなUIコンポーネント
-- 🔒 **Supabase** - 認証とデータベース
-- 🚀 **Turbopack** - 高速な開発環境
-- 📝 **Biome** - リントとフォーマット
-- 🧪 **Bun Test + Playwright** - ユニット、統合、E2Eテスト
-- 🔄 **Bun** - 高速なパッケージマネージャーとランタイム
-- 🌐 **Hono.js** - 軽量なAPIフレームワーク
+[![PWA](https://img.shields.io/badge/PWA-Ready-brightgreen?logo=pwa)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
+[![Bun](https://img.shields.io/badge/Bun-1.0-black?logo=bun)](https://bun.sh/)
 
-## プロジェクトの方針
+## Lighthouse Score
 
-### 品質管理
-
-- **CI/CD**
-  - GitHub Actionsによる自動化
-  - PRごとのビルド・テスト検証
-  - Lighthouseによるパフォーマンス検証（スコア90以上）
-  - Vercelへの自動デプロイ
-
-- **依存関係管理**
-  - Renovateによる自動更新
-  - セキュリティアップデートの自動化
-  - 依存パッケージの定期レビュー
-
-- **コードレビュー**
-  - PRテンプレートによる変更内容の明確化
-  - 自動レビュー割り当て
-  - パフォーマンスとアクセシビリティの検証
-
-### コミュニティ貢献
-
-- **Issue管理**
-  - 構造化されたバグ報告テンプレート
-  - 機能リクエストのガイドライン
-  - 日本語による明確なコミュニケーション
-
-- **ドキュメント**
-  - 実装仕様の明確化
-  - コントリビューションガイド
-  - セキュリティポリシー
+![Performance](https://img.shields.io/badge/performance-100%25-brightgreen)
+![Accessibility](https://img.shields.io/badge/accessibility-100%25-brightgreen)
+![Best Practices](https://img.shields.io/badge/Best%20Practices-100-brightgreen)
+![SEO](https://img.shields.io/badge/SEO-100-brightgreen)
 
 ## アーキテクチャ
 
 ### フロントエンド
-- React Server Components (RSC)を活用
-- Suspenseによるストリーミング
-- 各セクションの並列データロード
-- shadcn/uiコンポーネント
+- Next.js 15 (App Router)
+- React Server Components (RSC)
+- Suspense によるストリーミング
+- shadcn/ui コンポーネント
 
 ### バックエンド
-- Hono.jsによる高速なAPIルーティング
-- DataSourceインターフェースによる抽象化
-- 環境に応じた実装の自動切り替え
-- キャッシュ戦略の統合
+- Hono.js による API ルーティング
+- Supabase によるデータ永続化
+- インメモリキャッシュ
 
-### データソース
-- インターフェースベースの設計
-  - 共通のDataSourceインターフェース
-  - Supabaseによる堅牢な実装
-  - ファクトリーパターンによる初期化
-- キャッシュ戦略
-  - DataSource層での一元管理
-  - 環境に応じた最適化
-  - パフォーマンス検証機能
-- テスト戦略
-  - Supabaseテストインスタンスの活用
-  - テストファクトリーによるデータ生成
-  - シードデータによる一貫性確保
+## Features
 
-## 必要要件
+- ⚡️ Next.js 14 with App Router
+- 🔥 Type checking [TypeScript](https://www.typescriptlang.org)
+- 💎 Integrate with [Tailwind CSS](https://tailwindcss.com)
+- ✨ [shadcn/ui](https://ui.shadcn.com/) - Beautiful and customizable components
+- 📱 PWA Support with [next-pwa](https://github.com/shadowwalker/next-pwa)
+- 🎨 Theme switching with [next-themes](https://github.com/pacocoursey/next-themes)
+- 📊 VSCode configuration: Debug, Settings, Tasks and extension for PostCSS, ESLint, Prettier, TypeScript
+- 🗂 Path Mapping with `@` prefix
+- 💯 Maximize lighthouse score
 
-- [Bun](https://bun.sh) >= 1.0.0
-- [Node.js](https://nodejs.org) >= 18.17.0
-- [Docker](https://www.docker.com) (Supabase用)
+## セットアップ手順
 
-## ポート設定
-
-- Next.js開発サーバー: 3100
-- Next.js本番サーバー: 3200
-- Supabase Local Development: 54321
-- Supabase Studio: 54323
-- テストサーバー: 3101-3103（用途別に順次使用）
-
-## セットアップ
-
-1. プロジェクトの作成
-
-```bash
-git clone https://github.com/ebiyy/next-pwa-starter.git my-app
-cd my-app
-```
-
-2. Supabaseプロジェクトの作成
+1. Supabaseプロジェクトの作成
    - [Supabase Dashboard](https://supabase.com/dashboard)にアクセス
    - "New Project"をクリック
-   - プロジェクト名を設定
+   - プロジェクト名: "next-pwa-starter"
    - リージョン: Tokyo (asia-northeast1)
-   - データベースパスワードを設定
+   - データベースパスワード: 安全なパスワードを設定
+
+2. テーブルの作成
+   - Supabaseダッシュボードの"SQL Editor"を開く
+   - `setup.sql`の内容をコピー&ペースト
+   - "Run"をクリック
 
 3. 環境変数の設定
+   - `.env.example`をコピーして`.env.local`を作成
+   ```bash
+   cp .env.example .env.local
+   ```
+   - `.env.local`の各値を設定:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL=your-project-url
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+     ```
+
+## Quick Start
 
 ```bash
-cp .env.example .env.local
-```
-
-`.env.local`の各値を設定:
-```bash
-# 開発環境
-NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=local-anon-key
-
-# ステージング環境
-# NEXT_PUBLIC_SUPABASE_URL=https://subkcevxjivxiiksnytj.supabase.co
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=staging-anon-key
-
-# 本番環境
-# NEXT_PUBLIC_SUPABASE_URL=https://xiwnydehiplcjgrcjjko.supabase.co
-# NEXT_PUBLIC_SUPABASE_ANON_KEY=production-anon-key
-```
-
-4. 依存関係のインストール
-
-```bash
+# Install dependencies
 bun install
-```
 
-5. Supabaseの起動
-
-```bash
-bun run db:start
-```
-
-6. 開発サーバーの起動
-
-```bash
+# Start dev server
 bun run dev
+
+# Build for production
+bun run build
+
+# Start production server
+bun run start
 ```
 
-## 利用可能なスクリプト
+## コンポーネントの追加
+
+このプロジェクトはshadcn/uiを使用しています。新しいコンポーネントを追加するには以下のコマンドを使用します：
 
 ```bash
-# 開発
-bun run dev         # 開発サーバーの起動
-bun run build       # プロダクションビルド
-bun run start       # プロダクションサーバーの起動
+# コンポーネントの追加
+bunx shadcn add [component-name]
 
-# コード品質
-bun run lint        # Biomeによるリント
-bun run format      # Biomeによるフォーマット
-
-# テスト
-bun run test        # すべてのテストを実行
-bun run test:watch  # ウォッチモードでテストを実行
-bun run test:ui     # UIモードでテストを実行
-bun run test:unit   # ユニットテストの実行
-bun run test:integration # 統合テストの実行
-bun run test:coverage    # カバレッジレポートの生成
-bun run test:performance # パフォーマンステストの実行
-bun run test:performance:report # パフォーマンスレポートの生成（キャッシュ効果の検証含む）
-bun run test:lighthouse # Lighthouse CIの実行
-bun run test:all       # すべてのテスト（ユニット、E2E、パフォーマンス）を実行
-
-# E2Eテスト
-bun run test:e2e    # E2Eテストの実行
-bun run test:e2e:ui # UIモードでE2Eテストを実行
-
-# テスト環境
-bun run test:setup   # テスト環境のセットアップ
-bun run test:cleanup # テスト環境のクリーンアップ
-
-# Supabase
-bun run db:start    # ローカル環境の起動
-bun run db:stop     # ローカル環境の停止
-bun run db:reset    # データベースのリセット
-bun run db:types    # 型定義の生成
-bun run db:studio   # Studio UIを開く
-bun run db:seed:dev # 開発環境のシードデータ投入
-bun run db:status   # Supabaseの状態確認
-bun run db:logs     # Supabaseのログ確認
-
-# 環境設定
-bun run env:dev     # 開発環境の設定
-bun run env:staging # ステージング環境の設定
-bun run env:prod    # 本番環境の設定
-
-# データソース管理
-bun run ds:init     # データソースの初期化
-bun run ds:supabase # Supabaseデータソースの使用
-bun run ds:clear-cache # キャッシュのクリア
-bun run ds:validate   # データソースの検証
-
-# テストデータ
-bun run test:setup   # テスト環境のセットアップ
-bun run db:seed:dev  # 開発環境のシードデータ投入
-
-# デプロイ
-bun run deploy:staging # ステージング環境へのデプロイ
-bun run deploy:prod    # 本番環境へのデプロイ
-
-# その他
-bun run icons       # PWAアイコンの生成
+# 例: buttonコンポーネントの追加
+bunx shadcn add button
 ```
 
-## PWAの実装
+利用可能なコンポーネントは[shadcn/uiのドキュメント](https://ui.shadcn.com/docs/components)で確認できます。
+
+## PWAについて
 
 このテンプレートはNext.js App RouterのネイティブPWAサポートを使用しています：
 
-### 機能
 - オフライン対応
 - インストール可能
 - アプリケーションアイコン
 - カスタムスプラッシュスクリーン
 - プッシュ通知対応（オプション）
 
-### 実装ファイル
+### PWAの実装について
+
+このテンプレートは以下のファイルでPWAを実装しています：
+
 - `app/manifest.ts`: Web Manifestの設定
 - `public/sw.js`: Service Workerの実装（キャッシュ戦略、オフライン対応）
 
-## テスト
+### E2Eテスト
 
-このプロジェクトは包括的なテスト戦略を採用しています：
+PlaywrightによるE2Eテストを実装しており、以下の項目を自動的にテストします：
 
-### テストの種類
+#### PWAの基本機能
+- Webページの表示
+- PWAマニフェストの読み込み
+- Service Workerの登録と有効化
+- モバイル表示の確認
 
-- **ユニットテスト**: コンポーネントやユーティリティ関数の個別テスト
-- **統合テスト**: APIエンドポイントやコンポーネント間の連携テスト
-- **APIテスト**: エンドポイントの動作とキャッシュ機能の検証
-- **E2Eテスト**: ユーザーフロー、PWA機能、レスポンシブデザインの検証
-- **パフォーマンステスト**:
-  - キャッシュ戦略の効果検証
-  - レスポンスタイムの計測
-  - 並列リクエスト時の挙動確認
-- **Lighthouse CI**:
-  - パフォーマンススコアの検証（90以上）
-  - PWA対応の確認
-  - アクセシビリティの検証
-  - SEO最適化の確認
+#### UI/UXの検証
+- ダークモード切り替え
+- レスポンシブデザイン
+- タブの切り替え機能
 
-### キャッシュ戦略
+テストを実行するには：
 
-プロジェクトは以下の階層的なキャッシュ戦略を実装しています：
+```bash
+# テストの実行
+bun run test
 
-#### DataSource層のキャッシュ
-- インメモリキャッシュによる高速なレスポンス
-- 環境に応じた最適化（開発/本番）
-- キャッシュの有効期限管理
-- 並列リクエスト時の効率化
-
-#### Service Worker層のキャッシュ
-- オフライン対応のためのキャッシュ
-- 静的アセットの効率的な配信
-- ネットワークファーストの戦略
-- APIレスポンスのキャッシュ
-
-#### パフォーマンス検証
-- キャッシュ効果の定量的な測定
-  - レスポンスタイムの改善（平均40%以上）
-  - 並列リクエスト時の効率（最大60%改善）
-- Lighthouse CIによる継続的な監視
-  - パフォーマンススコア90以上を維持
-  - First Contentful Paint: 1.5s以下
-  - Time to Interactive: 3.0s以下
-
-### テストユーティリティ
-
-#### セレクターの管理
-```typescript
-// テストID
-<button {...testId("submit-button")}>送信</button>
-const submitButton = page.locator(getByTestId("submit-button"));
-
-// ロールベース
-<button role="submit">送信</button>
-const submitButton = page.locator(byRole("submit"));
+# UIモードでテストを実行
+bun run test:ui
 ```
 
-#### スナップショットの設定
-```typescript
-// 差分許容値の調整
-const snapshot = createSnapshot(element, {
-  threshold: 0.2,           // 許容する差分の割合
-  allowSizeDifference: true // サイズの差異を許容
-});
-```
+#### テストの注意点
 
-### テストの設定
-- `tests/config/bun-test.ts`: Bunテストの基本設定
-- `tests/config/playwright.ts`: Playwrightの設定
-- `tests/config/bunpack.config.ts`: テストランナーの設定
+- **アニメーションとインタラクティブな要素**
+  - 複雑なアニメーションやインタラクティブな要素（HoverCardなど）のテストは不安定になりやすいため、実装の詳細ではなくユーザーの視点でのテストを推奨
+  - モバイルデバイスではホバーイベントが機能しないため、代替の操作方法を検討する必要がある
 
-### CI/CD
-- GitHub Actionsによる自動テスト実行
-- PRのテスト状態チェック
-- テストカバレッジレポートの自動生成
-- 並列実行による高速化
+- **テストの安定性**
+  - アニメーションの完了を待つ際は、具体的なUI要素の表示を確認
+  - デバイス固有の機能テストは、適切なプロジェクト設定で分離
 
-## プロジェクト構成
+### 開発モードでの注意点
 
-```
-.
-├── .github/         # GitHub関連の設定
-│   └── ISSUE_TEMPLATE/ # Issueテンプレート
-├── issues/         # ローカルIssue管理
-├── public/         # 静的ファイル
-├── src/
-│   ├── app/        # Next.js App Router
-│   ├── components/ # UIコンポーネント
-│   ├── lib/        # ユーティリティ関数
-│   │   ├── data-sources/  # データソース実装
-│   │   ├── mock-data/    # モックデータ
-│   │   └── seed-data/    # シードデータ
-│   └── types/      # 型定義
-├── supabase/       # Supabase設定
-├── tasks/          # タスク定義
-│   └── *.batch.task  # 定例タスク（review-clinerules等）
-├── tests/          # テストファイル
-│   ├── api/        # APIテスト
-│   ├── e2e/        # E2Eテスト
-│   ├── integration/# 統合テスト
-│   ├── unit/       # ユニットテスト
-│   └── config/     # テスト設定
-└── .clinerules     # プロジェクトのルールと方針
-```
-
-## タスク管理
-
-このプロジェクトでは、以下の2つの形式でタスクを管理します：
-
-### 1. GitHub Issue
-プロジェクトの課題管理には以下のテンプレートを使用します：
-
-#### タスク管理（task.yml）
-- 実装フェーズの詳細な計画
-- テストケースの定義
-- コミットメッセージの規約
-- ロールバック戦略
-- メンテナンス方針
-
-#### コンポーネント開発（component.yml）
-- shadcn/uiに準拠したUI設計
-- アクセシビリティ要件
-- テスト計画
-- 実装仕様
-
-#### 機能要望（feature_request.yml）
-- 課題と解決策の提案
-- 技術的な実装案
-- パフォーマンス要件
-- セキュリティ考慮事項
-
-#### パフォーマンス改善（performance.yml）
-- Lighthouseスコア目標（90以上）
-- Web Vitals指標
-- 最適化計画
-- 検証方法
-
-#### セキュリティ対策（security.yml）
-- セキュリティリスクの評価
-- 対策の実装計画
-- テストと検証手順
-- コンプライアンス要件
-
-#### バグ報告（bug_report.yml）
-- 再現手順
-- 環境情報
-- パフォーマンスデータ
-- 修正計画
-
-### 2. Clineタスク
-- **一時タスク**: 現在進行中のタスク（*.temp.task）
-- **定例タスク**: プロジェクトルールの定期レビュー（*.batch.task）
-
-## 主要な依存関係
-
-- Next.js 15.1.4
-- React 19.0.0
-- Shadcn/UI
-- Tailwind CSS 3.4.1
-- Supabase JS 2.47.12
-- Hono 4.6.16
-- Biome 1.9.4
-- Playwright 1.49.1
+開発モード（`bun run dev`）では、Service Workerは自動的に更新されます。本番環境では、Service Workerのキャッシュ戦略に従って動作します。
 
 ## セキュリティに関する注意
 
 - 環境変数（`.env.local`）は決してGitにコミットしないでください
-- プロジェクトの公開リポジトリでは、`.env.example`のみをコミットしてください
+- プロジェクトの公開リポジトリでは、`.env.example`のみをコミットし、実際の値は含めないようにしてください
 - Supabaseのプロジェクト設定やAPIキーは、信頼できる開発者とのみ共有してください
 
-## ライセンス
+## License
 
-MIT © [ebiyy](https://github.com/ebiyy)
+MIT

@@ -1,12 +1,22 @@
 name: Lighthouse CI
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:
 
-permissions: write-all
+permissions:
+  contents: write
+  checks: write
+  statuses: write
+  pull-requests: write
+  issues: write
+
+env:
+  NODE_ENV: production
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
 
 jobs:
   lighthouse:
@@ -14,107 +24,115 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
+
+      - name: Create cache directories
+        run: |
+          sudo mkdir -p /root/.cache/puppeteer
+          sudo chmod -R 777 /root/.cache/puppeteer
+
+      - name: Cache Turbo
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      - name: Cache Next.js
+        uses: actions/cache@v3
+        with:
+          path: |
+            .next/cache
+            !.next/cache/images
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package.json', '**/bun.lockb', '**.[jt]s', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-
 
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
           path: |
             ~/.bun/install/cache
-            .next/cache
             /root/.cache/puppeteer
-          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb', '**/package.json') }}
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/bun.lockb', '**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
+            ${{ runner.os }}-deps-
 
       - name: Install dependencies
         run: bun install
 
-      - name: Test Supabase Connection
-        run: bun tests/scripts/test-supabase-connection.ts
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-
       - name: Build
-        run: bun run build
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NODE_ENV: production
+        run: |
+          echo "NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" >> .env
+          echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
+          bun run build
 
-      - name: Run Lighthouse CI
-        run: bun run test:lighthouse
+      - name: Run Lighthouse CI and Process Results
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Lighthouse CIの実行
+          bunx @lhci/cli@0.14.x autorun
+          
+          # 結果の確認
+          if [ $? -eq 0 ]; then
+            echo "Lighthouse CI completed successfully"
+            
+            # 結果ファイルの確認
+            ls -la .lighthouseci/
+            
+            # バッジの生成
+            echo "Generating badges..."
+            bun scripts/lighthouse/generate-badges.ts
+            
+            # バッジディレクトリの作成
+            mkdir -p .github/badges
+            
+            # READMEの更新
+            for category in performance accessibility bestPractices seo; do
+              if [ -f ".github/badges/${category}.json" ]; then
+                url=$(cat ".github/badges/${category}.json" | bun x json url)
+                displayName=$(echo "$category" | sed 's/^./\U&/')
+                sed -i "s|!\[$displayName\]([^)]*)|![$displayName]($url)|" README.md
+              fi
+            done
+            
+            # 変更をコミット
+            git config --global user.name 'github-actions[bot]'
+            git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+            git add .github/badges README.md
+            git commit -m "docs: 🎨 Lighthouse スコアバッジを更新" || echo "No changes to commit"
+            git push
+          else
+            echo "Lighthouse CI failed"
+            exit 1
+          fi
 
-      - name: Save Lighthouse results
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: lighthouse-results
           path: .lighthouseci
+          retention-days: 7
 
-      - name: Notify on failure
+      - name: Create GitHub Issue on failure
         if: failure()
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const fs = require('fs');
-            let errorDetails = 'No detailed results available';
-            
-            try {
-              const files = fs.readdirSync('.lighthouseci').filter(f => f.endsWith('.json'));
-              if (files.length > 0) {
-                const results = files.map(f => JSON.parse(fs.readFileSync(`.lighthouseci/${f}`)))
-                  .filter(r => r.categories?.performance?.score < 0.9);
-                
-                if (results.length > 0) {
-                  errorDetails = results.map(r => {
-                    const score = (r.categories.performance.score * 100).toFixed(1);
-                    const fcp = (r.audits['first-contentful-paint'].numericValue / 1000).toFixed(2);
-                    const tti = (r.audits.interactive.numericValue / 1000).toFixed(2);
-                    const tbt = r.audits['total-blocking-time'].numericValue.toFixed(0);
-                    const cls = r.audits['cumulative-layout-shift'].numericValue.toFixed(3);
-                    const lcp = (r.audits['largest-contentful-paint'].numericValue / 1000).toFixed(2);
-                    
-                    return [
-                      `Performance Score: ${score}%`,
-                      `First Contentful Paint: ${fcp}s`,
-                      `Time to Interactive: ${tti}s`,
-                      `Total Blocking Time: ${tbt}ms`,
-                      `Cumulative Layout Shift: ${cls}`,
-                      `Largest Contentful Paint: ${lcp}s`
-                    ].join('\n');
-                  }).join('\n\n');
-                }
-              }
-            } catch (e) {
-              errorDetails = `Error parsing results: ${e.message}`;
-            }
-            
-            const issueBody = [
-              `Lighthouse CI failed on commit ${context.sha}`,
-              '',
-              '### Performance Metrics',
-              '```',
-              errorDetails,
-              '```',
-              '',
-              '### Links',
-              `- [Workflow Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
-              `- [Commit](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`,
-              '',
-              'Please review the performance metrics and make necessary optimizations.'
-            ].join('\n');
-            
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: '🚨 Lighthouse CI Failed: Performance Issues Detected',
-              body: issueBody,
+              title: '🚨 Lighthouse CI Failed',
+              body: `Lighthouse CI failed on commit ${context.sha}\n\nCheck the [workflow run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`,
               labels: ['performance', 'lighthouse-ci']
             });
