@@ -36,8 +36,6 @@ jobs:
         run: |
           sudo mkdir -p /root/.cache/puppeteer
           sudo chmod -R 777 /root/.cache/puppeteer
-          mkdir -p .lighthouseci
-          chmod -R 777 .lighthouseci
 
       - name: Cache Turbo
         uses: actions/cache@v3
@@ -76,26 +74,11 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           bun run build
 
-      - name: Start server
-        run: bun run start & sleep 10
-
       - name: Run Lighthouse CI
         env:
           LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bunx @lhci/cli@0.14.x collect \
-            --url=http://localhost:3000 \
-            --settings.preset=desktop \
-            --settings.chromeFlags="--no-sandbox --disable-gpu" \
-            --output=.lighthouseci
-
-          bunx @lhci/cli@0.14.x upload \
-            --target=temporary-public-storage \
-            --githubStatusContextSuffix=":lighthouse" \
-            --outputDir=.lighthouseci
-
-          bunx @lhci/cli@0.14.x assert \
-            --preset=lighthouse:recommended
+          bunx @lhci/cli@0.14.x autorun
 
       - name: Upload artifacts
         if: always()
