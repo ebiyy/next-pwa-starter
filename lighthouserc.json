@@ -2,15 +2,17 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "bun run build && bun run start",
+      "startServerCommand": "bun run start",
       "url": ["http://localhost:3000"],
       "settings": {
         "preset": "desktop",
-        "chromeFlags": ["--no-sandbox", "--disable-gpu"]
+        "chromeFlags": ["--no-sandbox", "--disable-gpu"],
+        "outputPath": ".lighthouseci"
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "temporary-public-storage",
+      "outputDir": ".lighthouseci"
     },
     "assert": {
       "assertions": {
