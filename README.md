@@ -2,6 +2,26 @@
 
 モダンなウェブアプリケーション開発のためのミニマルなスターターキット。PWA対応、型安全、高パフォーマンスな開発環境を提供します。
 
+## Lighthouse スコア
+
+[![Performance: 0](https://img.shields.io/badge/Performance-0%25-orange)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![Accessibility: 0](https://img.shields.io/badge/Accessibility-0%25-orange)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![Best Practices: 0](https://img.shields.io/badge/Best%20Practices-0%25-orange)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![SEO: 0](https://img.shields.io/badge/SEO-0%25-orange)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+[![PWA: 0](https://img.shields.io/badge/PWA-0%25-orange)](https://github.com/ebiyy/next-pwa-starter/actions/workflows/lighthouse.yml)
+
+*Last updated: 2025-01-18*
+
+## Lighthouse スコア
+
+[![Performance: 0](https://img.shields.io/badge/Performance-0%25-orange)]()
+[![Accessibility: 0](https://img.shields.io/badge/Accessibility-0%25-orange)]()
+[![Best Practices: 0](https://img.shields.io/badge/Best%20Practices-0%25-orange)]()
+[![SEO: 0](https://img.shields.io/badge/SEO-0%25-orange)]()
+[![PWA: 0](https://img.shields.io/badge/PWA-0%25-orange)]()
+
+*Last updated: 2025-01-18*
+
 ## 特徴
 
 - 📱 **PWA対応** - オフライン対応とモバイルファーストな設計
