@@ -42,17 +42,17 @@ body:
       description: バッジ実装の各フェーズとステップ
       value: |
         ### 1. 基盤整備
-        - [ ] バッジ生成の自動化設定
-          - コミット: `chore: バッジ生成ワークフローの設定`
+        - [x] バッジ生成の自動化設定
+          - コミット: `feat: Lighthouseスコアの自動更新ワークフローを追加`
           - 対象ファイル:
-            - .github/workflows/badges.yml
+            - .github/workflows/lighthouse.yml
           - テスト:
             - GitHub Actionsの実行確認
           - ロールバック:
             - ワークフローファイルの削除
 
         ### 2. バッジの実装
-        - [ ] 技術スタックバッジ
+        - [x] 技術スタックバッジ
           - コミット: `docs: 技術スタックバッジの追加`
           - バッジ一覧:
             - ![Next.js](https://img.shields.io/badge/Next.js-15.1.4-black)
@@ -61,7 +61,7 @@ body:
             - ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)
             - ![Supabase](https://img.shields.io/badge/Supabase-2.47.12-3ECF8E)
 
-        - [ ] 品質指標バッジ
+        - [x] 品質指標バッジ
           - コミット: `docs: 品質指標バッジの追加`
           - バッジ一覧:
             - ![Lighthouse Performance](https://img.shields.io/badge/Lighthouse-Performance%20100-success)
@@ -77,7 +77,7 @@ body:
             - ![Test Coverage](https://img.shields.io/codecov/c/github/ebiyy/next-pwa-starter)
             - ![License](https://img.shields.io/github/license/ebiyy/next-pwa-starter)
 ### 3. 自動更新の設定
-- [ ] Lighthouseスコアの自動更新
+- [x] Lighthouseスコアの自動更新
   - コミット: `chore: Lighthouseスコア自動更新の設定`
   - 対象ファイル:
     - scripts/lighthouse/generate-badges.ts

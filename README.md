@@ -9,6 +9,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
 [![Bun](https://img.shields.io/badge/Bun-1.0-black?logo=bun)](https://bun.sh/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.47.12-3ECF8E?logo=supabase)](https://supabase.com/)
 
 ## Lighthouse Score
 
