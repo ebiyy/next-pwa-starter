@@ -23,10 +23,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
+
+      - name: Create cache directories
+        run: |
+          sudo mkdir -p /root/.cache/puppeteer
+          sudo chmod -R 777 /root/.cache/puppeteer
 
       - name: Cache Turbo
         uses: actions/cache@v3
@@ -65,12 +73,16 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           bun run build
 
+      - name: Create Lighthouse directory
+        run: mkdir -p .lighthouseci
+
       - name: Run Lighthouse CI
         run: bunx @lhci/cli@0.14.x autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
+        continue-on-error: true
         uses: actions/upload-artifact@v3
         if: always()
         with:
