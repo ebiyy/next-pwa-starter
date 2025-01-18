@@ -12,8 +12,8 @@
 
 ## Lighthouse Score
 
-![Performance](https://img.shields.io/badge/performance-100-brightgreen)
-![Accessibility](https://img.shields.io/badge/accessibility-100-brightgreen)
+![Performance](https://img.shields.io/badge/performance-100%25-brightgreen)
+![Accessibility](https://img.shields.io/badge/accessibility-100%25-brightgreen)
 ![Best Practices](https://img.shields.io/badge/Best%20Practices-100-brightgreen)
 ![SEO](https://img.shields.io/badge/SEO-100-brightgreen)
 
