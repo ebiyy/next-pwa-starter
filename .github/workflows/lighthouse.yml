@@ -76,11 +76,9 @@ jobs:
 
       - name: Run Lighthouse CI
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          bunx @lhci/cli@0.14.x autorun \
-            --upload.githubAppToken="$LHCI_GITHUB_APP_TOKEN" \
-            --upload.githubStatusContextSuffix="performance"
+          bunx @lhci/cli@0.14.x autorun
 
       - name: Upload artifacts
         if: always()

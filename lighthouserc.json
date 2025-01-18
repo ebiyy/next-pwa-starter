@@ -2,7 +2,7 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "startServerCommand": "bun run start",
+      "startServerCommand": "bun run build && bun run start",
       "url": ["http://localhost:3000"],
       "settings": {
         "preset": "desktop",
@@ -10,7 +10,8 @@
       }
     },
     "upload": {
-      "target": "temporary-public-storage"
+      "target": "github-app",
+      "gitHubToken": "$LHCI_GITHUB_TOKEN"
     },
     "assert": {
       "assertions": {
