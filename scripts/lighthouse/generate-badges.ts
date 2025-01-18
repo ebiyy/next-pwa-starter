@@ -21,9 +21,10 @@ const generateBadges = async () => {
     // Lighthouseの結果ファイルを読み込み
     const lighthouseDir = join(process.cwd(), ".lighthouseci");
     const files = readdirSync(lighthouseDir);
-    const lhrFile = files.find(
-      (file) => file.endsWith(".json") && !file.includes("manifest")
+    const lhrFiles = files.filter(
+      (file) => file.startsWith("lhr-") && file.endsWith(".json")
     );
+    const lhrFile = lhrFiles[0]; // 最初のレポートファイルを使用
     if (!lhrFile) {
       throw new Error("No Lighthouse report found");
     }
