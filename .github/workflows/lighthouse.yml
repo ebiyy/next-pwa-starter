@@ -11,6 +11,7 @@ permissions:
   checks: write
   statuses: write
   pull-requests: write
+  issues: write
 
 env:
   NODE_ENV: production
@@ -73,18 +74,18 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           bun run build
 
-      - name: Create Lighthouse directory
-        run: mkdir -p .lighthouseci
-
       - name: Run Lighthouse CI
-        run: bunx @lhci/cli@0.14.x autorun
         env:
-          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+        run: |
+          bunx @lhci/cli@0.14.x autorun \
+            --upload.target=github-status \
+            --upload.githubToken="$LHCI_GITHUB_APP_TOKEN" \
+            --upload.githubStatusContextSuffix="performance"
 
       - name: Upload artifacts
-        continue-on-error: true
-        uses: actions/upload-artifact@v3
         if: always()
+        uses: actions/upload-artifact@v3
         with:
           name: lighthouse-results
           path: .lighthouseci
