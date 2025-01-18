@@ -15,10 +15,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   compress: true,
   reactStrictMode: true,
-  swcMinify: true,
-  // Build optimization
   productionBrowserSourceMaps: false,
-  optimizeFonts: true,
   images: {
     unoptimized: false,
   },
