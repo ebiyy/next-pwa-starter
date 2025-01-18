@@ -80,6 +80,32 @@ jobs:
         run: |
           bunx @lhci/cli@0.14.x autorun
 
+      - name: Generate Lighthouse Badges
+        if: success()
+        run: |
+          bun scripts/lighthouse/generate-badges.ts
+
+      - name: Update README with Badges
+        if: success()
+        run: |
+          # バッジURLの取得と更新
+          for category in performance accessibility bestPractices seo; do
+            url=$(jq -r .url .github/badges/${category}.json)
+            # カテゴリ名の最初の文字を大文字に変換
+            displayName=$(echo "$category" | sed 's/^./\U&/')
+            # READMEの更新
+            sed -i "s|!\[$displayName\]([^)]*)|![$displayName]($url)|" README.md
+          done
+
+      - name: Commit and Push Changes
+        if: success()
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .github/badges README.md
+          git commit -m "docs: 🎨 Lighthouse スコアバッジを更新" || echo "No changes to commit"
+          git push
+
       - name: Upload artifacts
         if: always()
         uses: actions/upload-artifact@v3

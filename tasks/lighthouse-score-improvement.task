@@ -1,0 +1,196 @@
+name: Lighthouse Score改善タスク
+description: プロジェクトのLighthouse Scoreを改善する
+title: "[Task]: Lighthouse Score改善"
+labels: ["performance", "lighthouse-ci"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Next.js 14とPWAの最適化設定を見直し、Lighthouse Scoreを改善するためのタスク
+
+  - type: input
+    id: task-name
+    attributes:
+      label: タスク名
+      description: タスクの簡潔な名前
+      placeholder: "Lighthouse Score改善タスク"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 概要
+      description: |
+        タスクの目的と概要を記述
+      value: |
+        ### 目的
+        - プロジェクトのLighthouse Scoreを各カテゴリで90点以上に改善
+        - First Contentful Paint (FCP)を1.5秒以下に最適化
+        - Time to Interactive (TTI)を3秒以下に最適化
+        - Largest Contentful Paint (LCP)を2.5秒以下に最適化
+
+        ### 現状の課題
+        - パフォーマンススコアが目標値に達していない
+        - PWA最適化が不十分
+        - 画像最適化の余地がある
+        - JavaScriptバンドルサイズの最適化が必要
+
+        ### 期待される効果
+        - ユーザー体験の向上
+        - SEOスコアの改善
+        - モバイルデバイスでのパフォーマンス向上
+        - PWA機能の完全な活用
+
+  - type: textarea
+    id: implementation-phases
+    attributes:
+      label: 実装フェーズ
+      description: 実装の各フェーズとステップを記述
+      value: |
+        ### 1. 基盤整備
+        - [ ] Next.js最適化設定の見直し
+          - コミット: `perf: Next.jsの最適化設定を更新`
+          - 対象ファイル:
+            - next.config.ts
+          - テスト:
+            ```typescript
+            test('Next.jsの設定が最適化されている', () => {
+              // 設定値の検証
+              // - experimental.turbo
+              // - experimental.optimizePackageImports
+              // - productionBrowserSourceMaps
+            });
+            ```
+          - ロールバック:
+            - git revert で設定を元に戻す
+
+        - [ ] PWA最適化
+          - コミット: `perf: PWA設定の最適化`
+          - 対象ファイル:
+            - src/app/manifest.ts
+            - public/sw.js
+          - テスト:
+            ```typescript
+            test('PWAマニフェストが正しく設定されている', () => {
+              // マニフェスト設定の検証
+            });
+            test('Service Workerが適切にキャッシュを管理している', () => {
+              // キャッシュ戦略の検証
+            });
+            ```
+
+        ### 2. パフォーマンス最適化
+        - [ ] 画像最適化
+          - コミット: `perf: 画像の最適化設定を追加`
+          - 対象ファイル:
+            - next.config.ts (images設定)
+            - src/components/**/*.tsx (Image componentの使用箇所)
+          - テスト:
+            ```typescript
+            test('画像が最適化されて配信される', () => {
+              // next/imageの設定検証
+              // WebPフォーマットの確認
+              // サイズ最適化の確認
+            });
+            ```
+
+        - [ ] JavaScriptバンドル最適化
+          - コミット: `perf: JavaScriptバンドルの最適化`
+          - 対象ファイル:
+            - package.json (dependencies見直し)
+            - next.config.ts (optimizePackageImports設定)
+          - テスト:
+            ```typescript
+            test('バンドルサイズが閾値以下である', () => {
+              // バンドルサイズの検証
+              // 未使用コードの検出
+            });
+            ```
+
+        ### 3. テスト整備
+        - [ ] Lighthouse CI テストの強化
+          - コミット: `test: Lighthouse CIテストの強化`
+          - 対象ファイル:
+            - lighthouserc.json
+            - .github/workflows/lighthouse.yml
+          - テスト:
+            ```typescript
+            test('Lighthouse CIが正しく設定されている', () => {
+              // CI設定の検証
+              // スコア閾値の確認
+            });
+            ```
+
+  - type: textarea
+    id: conventions
+    attributes:
+      label: 規約
+      description: 実装時に従うべき規約
+      value: |
+        ### パフォーマンス規約
+        ```typescript
+        // 画像最適化
+        - next/imageを使用する
+        - 適切なサイズと形式を指定
+        - lazyLoading適用
+
+        // コンポーネント最適化
+        - React.memoの適切な使用
+        - useCallbackとuseMemoの戦略的な使用
+        - SSRとCSRの適切な使い分け
+
+        // バンドル最適化
+        - dynamic importの活用
+        - 不要なライブラリの削除
+        - tree-shakingの確認
+        ```
+
+  - type: textarea
+    id: maintenance
+    attributes:
+      label: メンテナンス
+      description: メンテナンス項目と手順
+      value: |
+        ### パフォーマンスモニタリング
+        ```typescript
+        // 定期的な確認項目
+        - Lighthouse Scoreの定期的な確認
+        - バンドルサイズの監視
+        - Core Web Vitalsの監視
+        - PWA機能の動作確認
+        ```
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: ロールバック戦略
+      description: 問題発生時の対処方法
+      value: |
+        ### パフォーマンス低下時の対応
+        ```typescript
+        // 手順
+        1. 最新のパフォーマンス低下コミットを特定
+        2. git revertで該当コミットを打ち消し
+        3. Lighthouse CIで再テスト
+        4. 影響範囲の確認とドキュメント更新
+        ```
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 注意事項
+      description: 実装時の注意点や重要な考慮事項
+      value: |
+        ### 最適化の注意点
+        - パフォーマンス改善とコード可読性のバランス
+        - 過度な最適化を避ける
+        - ユーザー体験を優先
+        - モバイルファーストの考え方を維持
+        - キャッシュ戦略の慎重な検討
+
+        ### 参考ドキュメント
+        - [Next.js Performance Optimization](https://nextjs.org/docs/app/building-your-application/optimizing)
+        - [Web Vitals](https://web.dev/vitals/)
+        - [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)
+        - [PWA Documentation](https://web.dev/progressive-web-apps/)
