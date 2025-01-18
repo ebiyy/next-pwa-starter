@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 interface LighthouseScore {
@@ -19,7 +19,16 @@ interface BadgeInfo {
 const generateBadges = async () => {
   try {
     // Lighthouseの結果ファイルを読み込み
-    const lhrPath = join(process.cwd(), ".lighthouseci", "lhr.json");
+    // Lighthouse CIの結果ファイルを探す
+    const lighthouseDir = join(process.cwd(), ".lighthouseci");
+    const files = readdirSync(lighthouseDir);
+    const lhrFile = files.find(
+      (file) => file.endsWith(".json") && !file.includes("manifest")
+    );
+    if (!lhrFile) {
+      throw new Error("No Lighthouse report found");
+    }
+    const lhrPath = join(lighthouseDir, lhrFile);
     const lhr = JSON.parse(readFileSync(lhrPath, "utf8")) as LighthouseScore;
 
     // スコアの抽出
