@@ -10,8 +10,7 @@
       }
     },
     "upload": {
-      "target": "github-status",
-      "githubStatusContextSuffix": "performance"
+      "target": "temporary-public-storage"
     },
     "assert": {
       "assertions": {

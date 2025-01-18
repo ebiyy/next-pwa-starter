@@ -79,8 +79,7 @@ jobs:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
         run: |
           bunx @lhci/cli@0.14.x autorun \
-            --upload.target=github-status \
-            --upload.githubToken="$LHCI_GITHUB_APP_TOKEN" \
+            --upload.githubAppToken="$LHCI_GITHUB_APP_TOKEN" \
             --upload.githubStatusContextSuffix="performance"
 
       - name: Upload artifacts
