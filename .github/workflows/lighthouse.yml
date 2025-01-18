@@ -74,23 +74,27 @@ jobs:
           echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" >> .env
           bun run build
 
-      - name: Run Lighthouse CI
+      - name: Run Lighthouse CI and Process Results
         env:
           LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Lighthouse CIの実行
           bunx @lhci/cli@0.14.x autorun
-
-      - name: Process Lighthouse Results
-        if: success()
-        run: |
-          # Lighthouse結果の確認
-          if [ -d ".lighthouseci" ]; then
-            echo "Generating badges from Lighthouse results..."
+          
+          # 結果の確認
+          if [ $? -eq 0 ]; then
+            echo "Lighthouse CI completed successfully"
+            
+            # 結果ファイルの確認
+            ls -la .lighthouseci/
+            
+            # バッジの生成
+            echo "Generating badges..."
             bun scripts/lighthouse/generate-badges.ts
-
+            
             # バッジディレクトリの作成
             mkdir -p .github/badges
-
+            
             # READMEの更新
             for category in performance accessibility bestPractices seo; do
               if [ -f ".github/badges/${category}.json" ]; then
@@ -99,7 +103,7 @@ jobs:
                 sed -i "s|!\[$displayName\]([^)]*)|![$displayName]($url)|" README.md
               fi
             done
-
+            
             # 変更をコミット
             git config --global user.name 'github-actions[bot]'
             git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -107,7 +111,7 @@ jobs:
             git commit -m "docs: 🎨 Lighthouse スコアバッジを更新" || echo "No changes to commit"
             git push
           else
-            echo "No Lighthouse results found"
+            echo "Lighthouse CI failed"
             exit 1
           fi
 
