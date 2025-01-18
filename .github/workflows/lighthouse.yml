@@ -79,7 +79,7 @@ jobs:
       - name: Run Lighthouse CI
         run: bunx @lhci/cli@0.14.x autorun
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts
         continue-on-error: true

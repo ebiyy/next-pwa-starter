@@ -10,8 +10,12 @@
       }
     },
     "upload": {
-      "target": "temporary-public-storage",
-      "githubStatusContextSuffix": "lighthouse"
+      "target": "temporary-public-storage"
+    },
+    "ci": {
+      "assert": {
+        "preset": "lighthouse:recommended"
+      }
     },
     "assert": {
       "assertions": {
