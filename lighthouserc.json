@@ -5,7 +5,13 @@
       "numberOfRuns": 3,
       "settings": {
         "preset": "desktop",
-        "onlyCategories": ["performance"],
+        "onlyCategories": [
+          "performance",
+          "accessibility",
+          "best-practices",
+          "seo",
+          "pwa"
+        ],
         "skipAudits": [
           "uses-http2",
           "errors-in-console",
